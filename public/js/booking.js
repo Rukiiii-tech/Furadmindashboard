@@ -143,19 +143,17 @@ document.addEventListener("DOMContentLoaded", async () => {
    * Handle date filter change to show/hide custom date inputs
    */
   const handleDateFilterChange = () => {
-    if (customDateInputs) {
-      if (currentDateFilter === "custom") {
-        customDateInputs.style.display = "block";
-        // Set default dates (current month)
-        const now = new Date();
-        const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-        const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    if (currentDateFilter === "custom") {
+      customDateInputs.style.display = "block";
+      // Set default dates (current month)
+      const now = new Date();
+      const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+      const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-        if (startDate) startDate.value = firstDay.toISOString().split("T")[0];
-        if (endDate) endDate.value = lastDay.toISOString().split("T")[0];
-      } else {
-        customDateInputs.style.display = "none";
-      }
+      startDate.value = firstDay.toISOString().split("T")[0];
+      endDate.value = lastDay.toISOString().split("T")[0];
+    } else {
+      customDateInputs.style.display = "none";
     }
 
     // Apply the filter
@@ -166,7 +164,6 @@ document.addEventListener("DOMContentLoaded", async () => {
    * Apply filters to bookings data
    */
   const applyFilters = () => {
-    // This is defined inside DOMContentLoaded, ensuring it's accessible to other functions inside
     renderBookingsTable();
   };
 
@@ -300,8 +297,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             filterEndDate = todayEnd;
             break;
           case "custom":
-            const startDateValue = startDate ? startDate.value : null;
-            const endDateValue = endDate ? endDate.value : null;
+            const startDateValue = startDate.value;
+            const endDateValue = endDate.value;
 
             if (startDateValue && endDateValue) {
               filterStartDate = new Date(startDateValue);
@@ -582,8 +579,95 @@ document.addEventListener("DOMContentLoaded", async () => {
    */
   const handleCheckoutClick = async (e) => {
     const bookingId = e.target.getAttribute("data-id");
-    await showCheckoutModal(bookingId);
+
+    // Simple modal with basic information
+    const booking = allBookingsData[bookingId];
+    if (!booking) {
+      showErrorNotification(
+        "Booking Not Found",
+        "The booking data could not be retrieved.",
+        "Please refresh the page and try again, or contact support if the issue persists.",
+        "❌"
+      );
+      return;
+    }
+
+    const customerName = booking.ownerInformation
+      ? `${booking.ownerInformation.firstName || ""} ${booking.ownerInformation.lastName || ""}`.trim()
+      : "N/A";
+
+    const petName = booking.petInformation?.petName || "N/A";
+    const serviceType = booking.serviceType || "N/A";
+
+    // Simple modal content
+    const modalContent = `
+      <div style="padding: 20px;">
+        <h3 style="color: #333; margin-bottom: 20px;">🐾 Pet Checkout</h3>
+        
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+          <h4 style="color: #ffb64a; margin-bottom: 10px;">Customer Information</h4>
+          <p><strong>Customer:</strong> ${customerName}</p>
+          <p><strong>Pet Name:</strong> ${petName}</p>
+          <p><strong>Service:</strong> ${serviceType}</p>
+        </div>
+        
+        <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+          <h4 style="color: #856404; margin-bottom: 10px;">💰 Payment Information</h4>
+          <p><strong>Total Amount:</strong> ₱1,200.00</p>
+          <p><strong>Down Payment:</strong> ₱600.00</p>
+          <p style="font-weight: bold; color: #dc3545; font-size: 1.2em;"><strong>Balance Due:</strong> ₱600.00</p>
+        </div>
+        
+        <div style="background: #d1ecf1; padding: 15px; border-radius: 8px; text-align: center;">
+          <p style="color: #0c5460; font-weight: bold;">✅ Ready for Checkout</p>
+          <p style="color: #0c5460;">Please collect the remaining balance from the customer.</p>
+        </div>
+      </div>
+    `;
+
+    // Get modal elements
+    const modal = document.getElementById("viewDetailsModal");
+    const modalContentDiv = document.getElementById("bookingDetailsContent");
+
+    if (modal && modalContentDiv) {
+      // Update modal content
+      modalContentDiv.innerHTML = modalContent;
+
+      // Show modal
+      modal.style.display = "flex";
+      document.getElementById("overlay").style.display = "block";
+
+      // Update modal title
+      const modalHeader = modal.querySelector(".modal-header h2");
+      if (modalHeader) {
+        modalHeader.textContent = `Checkout - ${customerName}`;
+      }
+
+      // Add close functionality
+      const closeBtn = modal.querySelector("#modalCloseBtn");
+      const closeFooterBtn = modal.querySelector("#modalCloseBtnFooter");
+      const overlay = document.getElementById("overlay");
+
+      const closeModal = () => {
+        modal.style.display = "none";
+        overlay.style.display = "none";
+      };
+
+      if (closeBtn) closeBtn.onclick = closeModal;
+      if (closeFooterBtn) closeFooterBtn.onclick = closeModal;
+      if (overlay) overlay.onclick = closeModal;
+    } else {
+      showErrorNotification(
+        "Modal Error",
+        "Modal elements not found.",
+        "Please refresh the page and try again.",
+        "❌"
+      );
+    }
   };
+
+  // Initial render of the table when the DOM is ready
+  renderBookingsTable();
 
   /**
    * Fetches and displays comprehensive details for a given booking ID using a modal.
@@ -620,12 +704,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     } else {
       console.log("Booking data found in cache:", bookingData);
     }
-
-    // --- FIX: Define customerName here to resolve ReferenceError ---
-    const customerName = bookingData.ownerInformation
-      ? `${bookingData.ownerInformation.firstName || ""} ${bookingData.ownerInformation.lastName || ""}`.trim()
-      : "N/A";
-    // ---------------------------------------------------------------
 
     // --- Construct the HTML for the modal content ---
     let detailsHtml = `
@@ -882,27 +960,27 @@ document.addEventListener("DOMContentLoaded", async () => {
         <div class="modal-section" style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
           <h3 style="color: #333; margin-bottom: 15px; border-bottom: 2px solid #ffb64a; padding-bottom: 10px;">📋 Booking Details</h3>
           <div class="info-item" style="margin-bottom: 12px; padding: 8px; background: white; border-radius: 6px;">
-            <strong style="color: #333;">Customer:</strong>
+            <strong style="color: #333;">Customer:</strong> 
             <span style="font-weight: normal; color: #666; float: right;">${customerName}</span>
           </div>
           <div class="info-item" style="margin-bottom: 12px; padding: 8px; background: white; border-radius: 6px;">
-            <strong style="color: #333;">Pet Name:</strong>
+            <strong style="color: #333;">Pet Name:</strong> 
             <span style="font-weight: normal; color: #666; float: right;">${petName}</span>
           </div>
           <div class="info-item" style="margin-bottom: 12px; padding: 8px; background: white; border-radius: 6px;">
-            <strong style="color: #333;">Service Type:</strong>
+            <strong style="color: #333;">Service Type:</strong> 
             <span style="font-weight: normal; color: #666; float: right;">${serviceType}</span>
           </div>
           <div class="info-item" style="margin-bottom: 12px; padding: 8px; background: white; border-radius: 6px;">
-            <strong style="color: #333;">Room Type:</strong>
+            <strong style="color: #333;">Room Type:</strong> 
             <span style="font-weight: normal; color: #666; float: right;">${roomType}</span>
           </div>
           <div class="info-item" style="margin-bottom: 12px; padding: 8px; background: white; border-radius: 6px;">
-            <strong style="color: #333;">Check-in Date:</strong>
+            <strong style="color: #333;">Check-in Date:</strong> 
             <span style="font-weight: normal; color: #666; float: right;">${checkInDate}</span>
           </div>
           <div class="info-item" style="margin-bottom: 0; padding: 8px; background: white; border-radius: 6px;">
-            <strong style="color: #333;">Check-out Date:</strong>
+            <strong style="color: #333;">Check-out Date:</strong> 
             <span style="font-weight: normal; color: #666; float: right;">${checkOutDate}</span>
           </div>
         </div>
@@ -1069,19 +1147,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       <div class="modal-section" style="background: #fff3cd; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #ffc107;">
         <h3 style="color: #856404; margin-bottom: 15px; border-bottom: 2px solid #ffc107; padding-bottom: 10px;">💰 Payment Summary</h3>
         <div class="info-item" style="margin-bottom: 15px; padding: 10px; background: white; border-radius: 5px;">
-          <strong style="color: #333;">Total Amount:</strong>
+          <strong style="color: #333;">Total Amount:</strong> 
           <span style="font-weight: bold; color: #28a745; font-size: 1.1em; float: right;">₱${totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
         </div>
         <div class="info-item" style="margin-bottom: 15px; padding: 10px; background: white; border-radius: 5px;">
-          <strong style="color: #333;">Down Payment Paid:</strong>
+          <strong style="color: #333;">Down Payment Paid:</strong> 
           <span style="font-weight: bold; color: #17a2b8; font-size: 1.1em; float: right;">₱${downPayment.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
         </div>
         <div class="info-item" style="margin-bottom: 15px; padding: 15px; background: #f8d7da; border-radius: 5px; border: 2px solid #dc3545;">
-          <strong style="color: #721c24; font-size: 1.2em;">BALANCE DUE:</strong>
+          <strong style="color: #721c24; font-size: 1.2em;">BALANCE DUE:</strong> 
           <span style="font-weight: bold; color: #dc3545; font-size: 1.3em; float: right;">₱${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
         </div>
         <div class="info-item" style="margin-bottom: 10px; padding: 10px; background: white; border-radius: 5px;">
-          <strong style="color: #333;">Payment Method:</strong>
+          <strong style="color: #333;">Payment Method:</strong> 
           <span style="font-weight: normal; color: #666; float: right;">${bookingData.paymentDetails?.method || "N/A"}</span>
         </div>
       </div>
@@ -1199,58 +1277,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (typeof weightKg !== "number" || isNaN(weightKg)) {
       return "N/A";
     }
-    // Using simple weight categories for the sake of consistency with existing code's logic
     if (weightKg < 10) return "Small";
-    if (weightKg >= 10.1 && weightKg <= 26) return "Medium";
-    if (weightKg >= 26.1 && weightKg <= 34) return "Large";
-    if (weightKg >= 34.1 && weightKg <= 38) return "XL";
+    if (weightKg >= 11 && weightKg <= 26) return "Medium";
+    if (weightKg >= 27 && weightKg <= 34) return "Large";
+    if (weightKg >= 34 && weightKg <= 38) return "XL";
     if (weightKg > 38) return "XXL";
     return "N/A"; // Fallback for weights outside defined ranges
-  }
-
-  // --- Real-Time Refresh Functions (Ensuring proper scope access to applyFilters) ---
-
-  /**
-   * Starts the real-time refresh functionality
-   */
-  function startRealTimeRefresh() {
-    // Clear any existing interval
-    if (refreshInterval) {
-      clearInterval(refreshInterval);
-    }
-
-    // Set up new interval to refresh every 30 seconds
-    refreshInterval = setInterval(async () => {
-      try {
-        console.log("Auto-refreshing bookings data...");
-
-        // applyFilters is accessible because this function is defined inside DOMContentLoaded
-        await applyFilters();
-      } catch (error) {
-        console.error("Error during auto-refresh:", error);
-      }
-    }, 30000); // 30 seconds
-
-    console.log("Real-time refresh started (every 30 seconds)");
-  }
-
-  /**
-   * Stops the real-time refresh functionality
-   */
-  function stopRealTimeRefresh() {
-    if (refreshInterval) {
-      clearInterval(refreshInterval);
-      refreshInterval = null;
-      console.log("Real-time refresh stopped");
-    }
-  }
-
-  /**
-   * Restarts the real-time refresh functionality
-   */
-  function restartRealTimeRefresh() {
-    stopRealTimeRefresh();
-    startRealTimeRefresh();
   }
 
   // Start real-time refresh (every 30 seconds)
@@ -1261,3 +1293,45 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Initialize acceptance monitoring
   initializeAcceptanceMonitoring();
 });
+
+/**
+ * Starts the real-time refresh functionality
+ */
+function startRealTimeRefresh() {
+  // Clear any existing interval
+  if (refreshInterval) {
+    clearInterval(refreshInterval);
+  }
+
+  // Set up new interval to refresh every 30 seconds
+  refreshInterval = setInterval(async () => {
+    try {
+      console.log("Auto-refreshing bookings data...");
+
+      await applyFilters();
+    } catch (error) {
+      console.error("Error during auto-refresh:", error);
+    }
+  }, 30000); // 30 seconds
+
+  console.log("Real-time refresh started (every 30 seconds)");
+}
+
+/**
+ * Stops the real-time refresh functionality
+ */
+function stopRealTimeRefresh() {
+  if (refreshInterval) {
+    clearInterval(refreshInterval);
+    refreshInterval = null;
+    console.log("Real-time refresh stopped");
+  }
+}
+
+/**
+ * Restarts the real-time refresh functionality
+ */
+function restartRealTimeRefresh() {
+  stopRealTimeRefresh();
+  startRealTimeRefresh();
+}
