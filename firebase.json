@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "furrytails-bb67e",
-    "public": "public"
+    "public": "public",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
   }
 }
