@@ -250,37 +250,39 @@ const renderApprovedBookingsTable = async () => {
       console.log("===================");
 
       // Format check-in date using the actual 'date' field from the database
-      let checkInDate = "N/A";
+      let checkInDateStr = "N/A";
+      let checkInDateObj = null;
       let isToday = false;
+      const oneDay = 24 * 60 * 60 * 1000;
 
       if (booking.date) {
         try {
-          const date = booking.date.toDate();
-          checkInDate = date.toLocaleDateString();
-          isToday =
-            date >= today &&
-            date < new Date(today.getTime() + 24 * 60 * 60 * 1000);
+          checkInDateObj = booking.date.toDate(); // 1. Try Firestore Timestamp
         } catch (e) {
-          // If it's not a Firestore timestamp, try as regular date
           try {
-            const date = new Date(booking.date);
-            checkInDate = date.toLocaleDateString();
-            isToday =
-              date >= today &&
-              date < new Date(today.getTime() + 24 * 60 * 60 * 1000);
+            checkInDateObj = new Date(booking.date); // 2. Try regular Date/ISO string
           } catch (e2) {
-            checkInDate = "N/A";
+            checkInDateObj = null;
           }
         }
       }
 
+      if (checkInDateObj && !isNaN(checkInDateObj.getTime())) {
+        checkInDateStr = checkInDateObj.toLocaleDateString();
+        isToday =
+          checkInDateObj >= today &&
+          checkInDateObj < new Date(today.getTime() + oneDay);
+      } else {
+        checkInDateStr = "N/A";
+      }
+
       // Try to get check-out date from boarding details for duration calculation
-      let checkOutDate = null;
+      let checkOutDateObj = null;
       if (booking.boardingDetails?.checkOutDate) {
         try {
-          checkOutDate = new Date(booking.boardingDetails.checkOutDate);
+          checkOutDateObj = new Date(booking.boardingDetails.checkOutDate);
         } catch (e) {
-          checkOutDate = null;
+          checkOutDateObj = null;
         }
       }
 
@@ -292,12 +294,13 @@ const renderApprovedBookingsTable = async () => {
         duration = `${booking.duration} days`;
       } else if (booking.numberOfDays) {
         duration = `${booking.numberOfDays} days`;
-      } else if (checkOutDate && checkInDate !== "N/A") {
+      } else if (checkOutDateObj && checkInDateObj) {
         try {
-          const checkIn = new Date(checkInDate);
-          const checkOut = checkOutDate;
-          const diffTime = Math.abs(checkOut - checkIn);
-          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          const diffTime = Math.abs(
+            checkOutDateObj.getTime() - checkInDateObj.getTime()
+          );
+          // Calculate days difference and round up to include the last day
+          const diffDays = Math.ceil(diffTime / oneDay);
           duration = `${diffDays} days`;
         } catch (e) {
           duration = "N/A";
@@ -329,7 +332,7 @@ const renderApprovedBookingsTable = async () => {
         <td style="${rowStyle}">${ownerName}</td>
         <td style="${rowStyle}">${serviceType}</td>
         <td style="${rowStyle}">${roomType}</td>
-        <td style="${rowStyle}">${checkInDate}</td>
+        <td style="${rowStyle}">${checkInDateStr}</td>
         <td style="${rowStyle}">${duration}</td>
         <td style="${rowStyle}">${statusBadge}</td>
         <td style="${rowStyle}">
@@ -450,6 +453,7 @@ function handleCheckoutClick(e) {
  */
 window.viewApprovedBookingDetails = async function (bookingId) {
   try {
+    // Crucial step: Retrieving the stored data using the bookingId
     const booking = allApprovedBookingsData[bookingId];
 
     if (!booking) {
@@ -457,26 +461,36 @@ window.viewApprovedBookingDetails = async function (bookingId) {
       return;
     }
 
-    // Format dates using the actual 'date' field from the database
+    // --- Robust Date Parsing ---
     let checkInDate = "N/A";
     let checkOutDate = "N/A";
+    let checkInDateObj = null;
+    let checkOutDateObj = null;
 
     if (booking.date) {
       try {
-        checkInDate = new Date(booking.date.toDate()).toLocaleDateString();
+        checkInDateObj = booking.date.toDate(); // 1. Try Firestore Timestamp
       } catch (e) {
-        checkInDate = new Date(booking.date).toLocaleDateString();
+        try {
+          checkInDateObj = new Date(booking.date); // 2. Try regular Date/ISO string
+        } catch (e2) {
+          checkInDateObj = null;
+        }
+      }
+      if (checkInDateObj && !isNaN(checkInDateObj.getTime())) {
+        checkInDate = checkInDateObj.toLocaleDateString();
       }
     }
 
     // Try to get check-out date from boarding details
     if (booking.boardingDetails?.checkOutDate) {
       try {
-        checkOutDate = new Date(
-          booking.boardingDetails.checkOutDate
-        ).toLocaleDateString();
+        checkOutDateObj = new Date(booking.boardingDetails.checkOutDate);
       } catch (e) {
-        checkOutDate = "N/A";
+        checkOutDateObj = null;
+      }
+      if (checkOutDateObj && !isNaN(checkOutDateObj.getTime())) {
+        checkOutDate = checkOutDateObj.toLocaleDateString();
       }
     }
 
@@ -488,17 +502,18 @@ window.viewApprovedBookingDetails = async function (bookingId) {
       duration = `${booking.duration} days`;
     } else if (booking.numberOfDays) {
       duration = `${booking.numberOfDays} days`;
-    } else if (checkOutDate && checkInDate !== "N/A") {
+    } else if (checkOutDateObj && checkInDateObj) {
       try {
-        const checkIn = new Date(checkInDate);
-        const checkOut = new Date(checkOutDate);
-        const diffTime = Math.abs(checkOut - checkIn);
+        const diffTime = Math.abs(
+          checkOutDateObj.getTime() - checkInDateObj.getTime()
+        );
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         duration = `${diffDays} days`;
       } catch (e) {
         duration = "N/A";
       }
     }
+    // --- End Robust Date Parsing ---
 
     // Get customer information using the actual field names from the database
     const petName = booking.petInformation?.petName || "N/A";
@@ -507,6 +522,9 @@ window.viewApprovedBookingDetails = async function (bookingId) {
       : "N/A";
     const serviceType = booking.serviceType || "N/A";
     const roomType = booking.boardingDetails?.selectedRoomType || "N/A";
+
+    // FIX: Define customerName using ownerName to resolve the ReferenceError
+    const customerName = ownerName;
 
     // Create modal content with standardized design matching pending bookings
     const modalContent = `
