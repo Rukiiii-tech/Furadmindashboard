@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pets - Furry Tails Meycauayan</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="tables.css" />
+    <link rel="stylesheet" href="pets.css" />
+    <link rel="stylesheet" href="modal.css" />
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <div class="sidebar">
+        <h1>Admin</h1>
+        <p class="welcome-text">Welcome, admin</p>
+
+        <nav>
+          <a href="dashboard.html">Dashboard</a>
+          <a href="users.html">Users</a>
+          <a href="pets.html" class="active">Pets</a>
+          <a href="bookings.html">Pending Bookings</a>
+          <a href="bookings-approved.html">Bookings</a>
+          
+          <!-- Reports Sub-menu -->
+          <div class="nav-item">
+            <a href="#" class="nav-link" id="reportsDropdown">Reports ▼</a>
+            <div class="submenu" id="reportsSubmenu">
+              <a href="booking-reports.html">Booking Reports</a>
+              <a href="feeding-reports.html">Feeding Reports</a>
+              <a href="sales-reports.html">Sales Reports</a>
+            </div>
+          </div>
+        </nav>
+
+        <a href="#" class="logout" id="logoutButton">Logout</a>
+      </div>
+
+      <div class="main-content">
+        <h1>Pets</h1>
+
+        <div class="table-container">
+          <table class="pets-table">
+            <thead>
+              <tr>
+                <th>Owner</th>
+                <th>Pet Name</th>
+                <th>Pet Breed</th>
+                <th>Pet Gender</th>
+                <th>Pet Weight</th>
+                <th>Birthdate</th>
+                <th>Cage Type</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="petsTableBody">
+              <tr>
+                <td colspan="8" style="text-align: center; padding: 20px">
+                  Loading pets...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="petDetailsModal">
+      <div class="modal-content">
+        <div class="modal-header modal-header-pet">
+          <h2 id="petDetailsModalHeader">Pet Details</h2>
+          <button class="close-modal" id="closePetModal">&times;</button>
+        </div>
+        <div class="modal-body pet-modal-body" id="petDetailsBody"></div>
+        <div class="modal-footer">
+          <button class="action-btn btn-secondary" id="closePetModalFooter">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+    <div id="overlay" class="overlay"></div>
+
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/modal_handler.js"></script>
+    <script type="module" src="js/pets.js"></script>
+    <script type="module">
+      import { initializeLogout } from "./js/logout-handler.js";
+      initializeLogout();
+
+      // Initialize modal close listeners for petDetailsModal
+      import { initializeModalCloseListeners } from "./js/modal_handler.js";
+      const petDetailsModal = document.getElementById("petDetailsModal");
+      initializeModalCloseListeners(
+        petDetailsModal,
+        "closePetModal",
+        "closePetModalFooter"
+      );
+    </script>
+    
+    <!-- Sub-menu Toggle Script -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const reportsDropdown = document.getElementById('reportsDropdown');
+        const reportsSubmenu = document.getElementById('reportsSubmenu');
+        
+        // Only handle reports dropdown clicks
+        reportsDropdown.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation(); // Prevent event bubbling
+          reportsSubmenu.classList.toggle('active');
+          
+          // Change arrow direction
+          if (reportsSubmenu.classList.contains('active')) {
+            reportsDropdown.innerHTML = 'Reports ▲';
+          } else {
+            reportsDropdown.innerHTML = 'Reports ▼';
+          }
+        });
+        
+        // Close submenu when clicking outside the reports section specifically
+        document.addEventListener('click', function(e) {
+          // Only close if clicking outside the reports dropdown area
+          if (!e.target.closest('#reportsDropdown') && !e.target.closest('#reportsSubmenu')) {
+            reportsSubmenu.classList.remove('active');
+            reportsDropdown.innerHTML = 'Reports ▼';
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
+

@@ -1,0 +1,417 @@
+/* Modal Styles */
+.modal {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  padding: 0;
+  color: #333;
+  max-width: 540px;
+  min-width: 320px;
+  border: 2.5px solid #ffb64a;
+  width: 96vw;
+  overflow: visible;
+}
+
+.modal.show {
+  display: block;
+}
+
+.modal-header {
+  background: #ffb64a;
+  color: #fff;
+  font-size: 1.35em;
+  font-weight: 700;
+  padding: 24px 36px 18px 36px;
+  border-radius: 16px 16px 0 0;
+  border-bottom: 2px solid #ffb64a;
+  letter-spacing: 0.5px;
+  position: relative;
+}
+
+.modal-body, .booking-modal-body, .pet-modal-body {
+  padding: 28px 36px 18px 36px;
+  font-size: 1.08em;
+  color: #333;
+  background: #fff;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.booking-details-section, .pet-details-section {
+  background: #fff9ed;
+  border: 1.5px solid #ffb64a;
+  border-radius: 12px;
+  padding: 20px 28px;
+  margin-bottom: 18px;
+  box-shadow: 0 2px 8px rgba(255,182,74,0.08);
+}
+
+.booking-details-section h3, .pet-details-section h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 1.13em;
+  color: #ffb64a;
+  font-weight: 700;
+  border-bottom: 2px solid #ffb64a33;
+  padding-bottom: 6px;
+}
+
+.booking-details-group, .pet-details-group {
+  margin-bottom: 14px;
+}
+
+.booking-details-label, .pet-details-label {
+  display: block;
+  font-size: 0.97em;
+  color: #888;
+  margin-bottom: 3px;
+  font-weight: 600;
+}
+
+.booking-details-value, .pet-details-value {
+  background: #fff;
+  border: 1px solid #ffb64a55;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 1.08em;
+  color: #333;
+  min-width: 180px;
+  margin-bottom: 0;
+}
+
+.modal-footer {
+  padding: 18px 36px 24px 36px;
+  display: flex;
+  justify-content: flex-end;
+  background: #fff;
+  border-radius: 0 0 16px 16px;
+}
+
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.overlay.show {
+  display: block;
+}
+
+/* Modal Buttons */
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: #ffb64a;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #ff9f1a;
+}
+
+.btn-secondary {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.btn-secondary:hover {
+  background: #d0d0d0;
+}
+
+/* Booking Report Details Modal Formal Styles */
+.booking-details-section:last-child {
+  border-bottom: none;
+}
+.booking-details-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffb64a;
+  margin-bottom: 8px;
+  margin-top: 12px;
+}
+.booking-details-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.booking-details-image {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 10px 0;
+  border-radius: 6px;
+  border: 1px solid #eee;
+}
+
+/* Booking Report Details Modal - Card Style */
+.booking-details-modal-body {
+  padding: 30px;
+  background-color: #fff;
+  max-width: 900px;
+  overflow-x: auto;
+  min-width: 600px;
+}
+.booking-details-info {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+  width: 100%;
+}
+.booking-details-section-card {
+  background: #fff9f0;
+  border-radius: 8px;
+  padding: 20px;
+  border: 1px solid #ffb64a;
+  margin-bottom: 0;
+}
+.booking-details-section-card h3 {
+  font-size: 16px;
+  color: #000;
+  margin: 0 0 20px 0;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #ffb64a;
+  font-weight: 600;
+}
+.booking-details-group {
+  margin-bottom: 20px;
+}
+.booking-details-group label {
+  display: block;
+  font-size: 13px;
+  color: #000;
+  margin-bottom: 8px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.booking-details-group span {
+  display: block;
+  font-size: 15px;
+  color: #333;
+  padding: 12px 16px;
+  background-color: #fff;
+  border: 1px solid #ffb64a;
+  border-radius: 6px;
+  min-height: 42px;
+}
+@media (max-width: 1100px) {
+  .booking-details-modal-body {
+    max-width: 98vw;
+    min-width: 0;
+    padding: 10px;
+  }
+  .booking-details-info {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+/* Pet Details Modal Card Layout */
+.pet-details-section h3 {
+  margin-top: 0;
+  margin-bottom: 18px;
+  font-size: 1.2em;
+  color: #ffb64a;
+  font-weight: 700;
+  border-bottom: 2px solid #ffb64a33;
+  padding-bottom: 6px;
+}
+
+.pet-details-group {
+  margin-bottom: 16px;
+}
+
+.pet-details-label {
+  display: block;
+  font-size: 0.95em;
+  color: #888;
+  margin-bottom: 3px;
+  font-weight: 600;
+}
+
+.pet-details-value {
+  background: #fff;
+  border: 1px solid #ffb64a55;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 1.08em;
+  color: #333;
+  min-width: 180px;
+  margin-bottom: 0;
+}
+
+@media (max-width: 700px) {
+  .pet-modal-body {
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 0;
+  }
+  .pet-details-section {
+    min-width: unset;
+    padding: 16px 10px;
+  }
+}
+
+/* Booking Details Modal Card Layout */
+.booking-details-section h3 {
+  margin-top: 0;
+  margin-bottom: 18px;
+  font-size: 1.2em;
+  color: #ffb64a;
+  font-weight: 700;
+  border-bottom: 2px solid #ffb64a33;
+  padding-bottom: 6px;
+}
+
+.booking-details-group {
+  margin-bottom: 16px;
+}
+
+.booking-details-label {
+  display: block;
+  font-size: 0.95em;
+  color: #888;
+  margin-bottom: 3px;
+  font-weight: 600;
+}
+
+.booking-details-value {
+  background: #fff;
+  border: 1px solid #ffb64a55;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 1.08em;
+  color: #333;
+  min-width: 180px;
+  margin-bottom: 0;
+}
+
+@media (max-width: 700px) {
+  .booking-modal-body {
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 0;
+  }
+  .booking-details-section {
+    min-width: unset;
+    padding: 16px 10px;
+  }
+}
+
+.btn-view, .action-btn.btn-view {
+  background-color: #2196f3;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 18px;
+  font-size: 1em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.btn-view:hover, .btn-view:focus, .action-btn.btn-view:hover, .action-btn.btn-view:focus {
+  background-color: #ffb64a;
+  color: #fff;
+}
+
+/* Formal Notification Modal Design */
+.btn.btn-secondary, .btn.btn-primary {
+  background: #ffb64a;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 22px;
+  font-size: 1em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btn.btn-secondary:hover, .btn.btn-primary:hover {
+  background: #e6a43f;
+  color: #fff;
+}
+
+/* Modal close button (X) */
+.close-modal, #customModalCloseBtn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.5em;
+  font-weight: bold;
+  cursor: pointer;
+  position: absolute;
+  top: 18px;
+  right: 24px;
+  transition: color 0.2s;
+}
+.close-modal:hover, #customModalCloseBtn:hover {
+  color: #333;
+}
+
+@media (max-width: 700px) {
+  .modal {
+    max-width: 98vw;
+    min-width: unset;
+    padding: 0;
+  }
+  .modal-header, .modal-body, .modal-footer {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .booking-details-section, .pet-details-section {
+    padding: 12px 6px;
+  }
+}
+
+@media (max-width: 900px) {
+  .modal {
+    max-width: 98vw;
+    min-width: unset;
+  }
+  .modal-body, .booking-modal-body, .pet-modal-body {
+    padding: 16px 10px;
+    max-height: none;
+  }
+  .booking-details-section, .pet-details-section {
+    min-width: unset;
+    max-width: unset;
+    padding: 16px 10px;
+  }
+}
+
+/* Specific styles for the logout modal to prevent overlap and improve appearance */
+#logoutModal.modal {
+  max-width: 400px;
+  width: 90vw;
+  padding: 0;
+}
+
+#logoutModal .modal-header {
+  padding: 20px 24px 14px 24px;
+  font-size: 1.2em;
+}
+
+#logoutModal .modal-body {
+  padding: 18px 24px 10px 24px;
+}
+
+#logoutModal .modal-footer {
+  padding: 14px 24px 20px 24px;
+  justify-content: center;
+  gap: 8px;
+} 

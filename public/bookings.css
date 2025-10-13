@@ -1,0 +1,25 @@
+/* Bookings Page Specific Styles */
+
+/* Flatpickr custom day styling (moved from JS to CSS) */
+/* The classes `highlighted-booking` and `booking-count-badge` are applied by `booking.js` */
+.flatpickr-day.highlighted-booking {
+  background: #f57c00 !important; /* Important to override Flatpickr defaults */
+  color: #fff !important;
+  border-radius: 6px !important;
+  position: relative;
+}
+
+.flatpickr-day.highlighted-booking .booking-count-badge {
+  background: #fff;
+  color: #f57c00;
+  font-weight: bold;
+  font-size: 0.85em;
+  border-radius: 50%;
+  padding: 2px 7px;
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+/* No other unique styles needed based on previous content for bookings.css */

@@ -1,0 +1,37 @@
+/* Users Page Specific Styles */
+
+/* Table styles are now primarily managed by tables.css */
+/* Only add overrides or unique styles here */
+
+/* For specific column styling if different from data-table defaults */
+.users-table th:first-child,
+.users-table td:first-child {
+  width: 5%; /* Adjusted for # column - very narrow */
+}
+
+.users-table th:nth-child(2),
+.users-table td:nth-child(2) {
+  width: 18%; /* For Name column - more space */
+}
+
+.users-table th:nth-child(3),
+.users-table td:nth-child(3) {
+  width: 25%; /* For Email column - more space as emails can be long */
+}
+
+.users-table th:nth-child(4),
+.users-table td:nth-child(4) {
+  width: 15%; /* For Contact No column */
+}
+
+.users-table th:nth-child(5),
+.users-table td:nth-child(5) {
+  width: 22%; /* For Address column - significantly more space */
+}
+
+.users-table th:nth-child(6),
+.users-table td:nth-child(6) {
+  width: 15%; /* For Role column */
+}
+
+/* All modal styles are now managed by modal.css */

@@ -1,0 +1,194 @@
+/* Specific Modal Styles for Pet Details */
+
+.modal#petDetailsModal {
+  display: none; /* Hidden by default */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  width: 90%; /* Adjust width as needed */
+  max-width: 600px; /* Max width for larger screens, adjust as needed */
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  border: 2px solid #cacaca; /* Example border */
+  overflow: hidden;
+}
+
+.modal#petDetailsModal.show {
+  display: block;
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+.modal-header-pet {
+  /* Specific header for pet modal */
+  padding: 24px 30px;
+  border-bottom: 2px solid #6c757d; /* Example color, adjust to your theme */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #6c757d; /* Example color */
+  color: white;
+}
+
+.modal-header-pet h2 {
+  font-size: 22px;
+  font-weight: 600;
+  color: white;
+  margin: 0;
+  letter-spacing: 0.3px;
+}
+
+.modal-header-pet .close-modal {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: white;
+  cursor: pointer;
+  padding: 8px;
+  line-height: 1;
+  transition: all 0.2s ease;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-header-pet .close-modal:hover {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: rotate(90deg);
+}
+
+.pet-modal-body {
+  padding: 30px;
+  background-color: #ffffff;
+}
+
+.pet-details-section {
+  background: #f8f9fa; /* Lighter background for sections */
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid #e9ecef;
+}
+
+.pet-details-section h3 {
+  font-size: 16px;
+  color: #343a40;
+  margin: 0 0 20px 0;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e9ecef;
+  font-weight: 600;
+}
+
+.pet-details-group {
+  margin-bottom: 15px;
+}
+
+.pet-details-group:last-child {
+  margin-bottom: 0;
+}
+
+.pet-details-label {
+  display: block;
+  font-size: 13px;
+  color: #6c757d;
+  margin-bottom: 5px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pet-details-value {
+  display: block;
+  font-size: 15px;
+  color: #212529;
+  padding: 10px 15px;
+  background-color: #ffffff;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  min-height: 38px;
+  transition: all 0.2s ease;
+}
+
+.pet-details-group:hover .pet-details-value {
+  background-color: #f1f3f5;
+  border-color: #adb5bd;
+}
+
+/* Re-use overlay styles from modal.css or define here if not present */
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+}
+
+.overlay.show {
+  display: block;
+  animation: overlayFadeIn 0.3s ease-out;
+}
+
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+@media (max-width: 768px) {
+  .modal#petDetailsModal {
+    width: 95%;
+    margin: 20px;
+    max-width: unset;
+  }
+
+  .modal-header-pet {
+    padding: 20px;
+  }
+
+  .pet-modal-body {
+    padding: 20px;
+  }
+
+  .pet-details-section {
+    padding: 15px;
+  }
+
+  .pet-details-group {
+    margin-bottom: 12px;
+  }
+
+  .pet-details-label {
+    font-size: 11px;
+  }
+
+  .pet-details-value {
+    font-size: 13px;
+    padding: 8px 12px;
+    min-height: 34px;
+  }
+}

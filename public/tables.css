@@ -1,0 +1,215 @@
+/* Table Layout and Base Styles */
+.table-container {
+  background: white;
+  border-radius: 15px;
+  padding: 20px;
+
+  overflow-x: auto; /* Enable horizontal scrolling for small screens */
+  border: 2px solid #cacaca;
+  margin-top: 20px; /* Consistent margin */
+}
+
+/* Make tables vertically scrollable when many rows (used with table-scroll-handler) */
+.table-container.scrollable {
+  max-height: 60vh; /* Limit height to viewport for better usability */
+  overflow-y: auto; /* Enable vertical scrolling */
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+.data-table,
+.users-table, /* Apply common styles to users-table as well */
+.pets-table {
+  /* Apply common styles to pets-table as well */
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px; /* Ensure table doesn't shrink too much */
+  border-radius: 15px;
+  overflow: hidden; /* Ensures rounded corners apply to content */
+  background-color: white; /* Ensure consistent background */
+  font-size: 14px;
+  border: 2px solid #cacaca;
+}
+
+.data-table thead,
+.users-table thead,
+.pets-table thead {
+  background-color: #ffb64a; /* Main orange theme color */
+  color: white;
+}
+
+.data-table th,
+.users-table th,
+.pets-table th {
+  padding: 15px;
+  text-align: center; /* Changed from left to center for header alignment */
+  font-weight: 500;
+  border-bottom: 2px solid #eee; /* Stronger border for header */
+  border-right: 1px solid rgba(255, 255, 255, 0.2); /* Light separator for headers */
+}
+
+.data-table th:last-child,
+.users-table th:last-child,
+.pets-table th:last-child {
+  border-right: none; /* No right border on last header */
+}
+
+.data-table td,
+.users-table td,
+.pets-table td {
+  padding: 15px;
+  text-align: left; /* Keep cell content left-aligned */
+  border-bottom: 1px solid #eee;
+  border-right: 1px solid #f0f0f0; /* Light separator for cells */
+}
+
+.data-table td:last-child,
+.users-table td:last-child,
+.pets-table td:last-child {
+  border-right: none; /* No right border on last cell */
+}
+
+.data-table tbody tr:nth-child(even),
+.users-table tbody tr:nth-child(even),
+.pets-table tbody tr:nth-child(even) {
+  background-color: #f8f9fa; /* Light grey for even rows */
+}
+
+.data-table tbody tr:hover,
+.users-table tbody tr:hover,
+.pets-table tbody tr:hover {
+  background-color: #fff9f0; /* Lighter orange on hover */
+}
+
+/* Specific column widths (Example, adjust as needed per table) */
+.users-table th:first-child,
+.users-table td:first-child {
+  width: 5%; /* For # column */
+}
+
+.users-table th:nth-child(2),
+.users-table td:nth-child(2) {
+  width: 15%; /* For Booking ID in bookings/reports, or Name in users */
+}
+
+/* Status Badges */
+.status-badge {
+  padding: 6px 10px;
+  border-radius: 5px;
+  font-size: 0.9em;
+  font-weight: bold;
+  display: inline-block;
+  min-width: 80px; /* Ensure consistent width */
+  text-align: center;
+  white-space: nowrap; /* Prevent text wrapping */
+}
+
+.status-pending {
+  background-color: #fff3e0; /* Light orange/yellow */
+  color: #f57c00; /* Darker orange */
+}
+
+.status-accepted, /* Renamed from accepted to approved for consistency */
+.status-approved {
+  background-color: #e8f5e9; /* Light green */
+  color: #2e7d32; /* Darker green */
+}
+
+.status-rejected {
+  background-color: #ffebee; /* Light red */
+  color: #c62828; /* Darker red */
+}
+
+.status-completed {
+  background-color: #e0f2f7; /* Light blue */
+  color: #01579b; /* Darker blue */
+}
+
+.status-checked-out {
+  background-color: #f3e5f5; /* Light purple */
+  color: #6a1b9a; /* Darker purple */
+}
+
+/* Action Buttons within tables */
+.action-btn {
+  padding: 8px 12px;
+  margin: 2px; /* Small margin between buttons */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9em;
+  font-weight: 600;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
+  white-space: nowrap; /* Prevent text wrapping */
+  display: inline-flex; /* For better alignment if icons are added later */
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-view {
+  background-color: #ffb64a; /* Bootstrap-like info blue */
+  color: white;
+}
+
+.btn-view:hover {
+  background-color: #218838; /* Darker blue */
+  transform: translateY(-1px);
+}
+
+.btn-accept {
+  background-color: #28a745; /* Bootstrap-like success green */
+  color: white;
+}
+
+.btn-accept:hover {
+  background-color: #218838;
+  transform: translateY(-1px);
+}
+
+.btn-reject {
+  background-color: #dc3545; /* Bootstrap-like danger red */
+  color: white;
+}
+
+.btn-reject:hover {
+  background-color: #c82333;
+  transform: translateY(-1px);
+}
+
+/* Responsive adjustments for table action buttons */
+@media (max-width: 768px) {
+  .action-buttons {
+    flex-direction: column; /* Stack buttons vertically on small screens */
+    gap: 4px;
+  }
+
+  .action-btn {
+    width: 100%; /* Make buttons full width in stacked layout */
+    margin: 2px 0; /* Adjust margin for stacking */
+  }
+
+  .data-table,
+  .users-table,
+  .pets-table {
+    min-width: 100%; /* Allow tables to shrink on small screens */
+    font-size: 13px; /* Slightly smaller font */
+  }
+
+  .data-table th,
+  .users-table th,
+  .pets-table th,
+  .data-table td,
+  .users-table td,
+  .pets-table td {
+    padding: 10px 12px; /* Reduced padding */
+  }
+
+  .status-badge {
+    padding: 4px 6px;
+    font-size: 0.8em;
+    min-width: 60px;
+  }
+}
+
+

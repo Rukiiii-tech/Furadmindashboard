@@ -1,0 +1,79 @@
+@media screen {
+  .print-only,
+  .print-table-container {
+    display: none;
+  }
+}
+
+@media print {
+  html,
+  body {
+    background: #ffffff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* Hide all dashboard UI elements */
+  .sidebar,
+  .logout,
+  .controls-section,
+  .table-container,
+  .modal,
+  .overlay,
+  .no-print,
+  .page-header {
+    display: none !important;
+  }
+
+  /* Show the specific content for printing */
+  .print-only,
+  .print-table-container {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .print-header {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #000;
+  }
+
+  .print-header h1 {
+    font-size: 20px;
+    margin: 0 0 4px 0;
+  }
+
+  .print-header .meta {
+    font-size: 12px;
+  }
+
+  /* Style the printed table */
+  .print-table-container .data-table {
+    min-width: 0 !important;
+    width: 100% !important;
+    border: 1px solid #000 !important;
+    font-size: 12px !important;
+    page-break-inside: auto !important;
+  }
+
+  .print-table-container .data-table th,
+  .print-table-container .data-table td {
+    border: 1px solid #000 !important;
+    padding: 8px !important;
+    page-break-inside: avoid !important;
+  }
+
+  .print-table-container .data-table tbody tr:nth-child(even),
+  .print-table-container .data-table tbody tr:hover {
+    background: none !important;
+  }
+
+  a {
+    text-decoration: none !important;
+    color: #000 !important;
+  }
+}

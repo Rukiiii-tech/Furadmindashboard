@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Feeding Reports - Furry Tails Meycauayan</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="tables.css" />
+    <link rel="stylesheet" href="feeding-reports.css" />
+    <link rel="stylesheet" href="modal.css" />
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <div class="sidebar">
+        <h1>Admin</h1>
+        <p class="welcome-text">Welcome, admin</p>
+
+        <nav>
+          <a href="dashboard.html">Dashboard</a>
+          <a href="users.html">Users</a>
+          <a href="pets.html">Pets</a>
+          <a href="bookings.html">Pending Bookings</a>
+          <a href="bookings-approved.html">Bookings</a>
+
+          <div class="nav-item">
+            <a href="#" class="nav-link" id="reportsDropdown">Reports ▼</a>
+            <div class="submenu active" id="reportsSubmenu">
+              <a href="booking-reports.html">Booking Reports</a>
+              <a href="feeding-reports.html" class="active">Feeding Reports</a>
+              <a href="sales-reports.html">Sales Reports</a>
+            </div>
+          </div>
+        </nav>
+
+        <a href="#" class="logout" id="logoutButton">Logout</a>
+      </div>
+
+      <div class="main-content">
+        <h1>Feeding Reports</h1>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Report ID</th>
+                <th>Pet Name</th>
+                <th>Room Type</th>
+                <th>Feeding Time</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="feedingTableBody">
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 20px">
+                  Loading feeding reports...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination-controls">
+          <button id="prevPageBtn" disabled>Previous</button>
+          <span id="pageInfo">Page 1</span>
+          <button id="nextPageBtn" disabled>Next</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="detailsModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modalHeader">Details</h2>
+          <button id="modalCloseBtn" class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+        <div class="modal-footer">
+          <button id="modalCloseBtnFooter" class="btn btn-secondary">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+    <div id="overlay" class="overlay"></div>
+
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/feeding-reports.js"></script>
+    <script type="module" src="js/modal_handler.js"></script>
+    <script type="module">
+      import { initializeLogout } from "./js/logout-handler.js";
+      initializeLogout();
+    </script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const reportsDropdown = document.getElementById("reportsDropdown");
+        const reportsSubmenu = document.getElementById("reportsSubmenu");
+
+        // Only handle reports dropdown clicks
+        reportsDropdown.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation(); // Prevent event bubbling
+          reportsSubmenu.classList.toggle("active");
+
+          // Change arrow direction
+          if (reportsSubmenu.classList.contains("active")) {
+            reportsDropdown.innerHTML = "Reports ▲";
+          } else {
+            reportsDropdown.innerHTML = "Reports ▼";
+          }
+        });
+
+        // Close submenu when clicking outside the reports section specifically
+        document.addEventListener("click", function (e) {
+          // Only close if clicking outside the reports dropdown area
+          if (
+            !e.target.closest("#reportsDropdown") &&
+            !e.target.closest("#reportsSubmenu")
+          ) {
+            reportsSubmenu.classList.remove("active");
+            reportsDropdown.innerHTML = "Reports ▼";
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

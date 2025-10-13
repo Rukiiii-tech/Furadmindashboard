@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pending Bookings - Furry Tails Meycauayan</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="tables.css" />
+    <link rel="stylesheet" href="modal.css" />
+    <style>
+      .status-badge {
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 500;
+        display: inline-block;
+      }
+      .status-pending {
+        background-color: #fff3e0;
+        color: #f57c00;
+      }
+      .status-approved {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+      }
+      .status-rejected {
+        background-color: #ffebee;
+        color: #c62828;
+      }
+      .status-cancelled {
+        background-color: #f0f0f0; /* Light grey for cancelled */
+        color: #616161; /* Dark grey text */
+      }
+      .status-checked-out {
+        background-color: #e0f2f7; /* Light blue */
+        color: #01579b; /* Darker blue */
+      }
+      .status-check-in {
+        background-color: #e8f5e8; /* Light green */
+        color: #2e7d32; /* Dark green */
+      }
+
+      /* Ensure action buttons are always visible */
+      .action-btn {
+        display: inline-block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        margin: 2px !important;
+        padding: 8px 12px !important;
+        border: none !important;
+        border-radius: 5px !important;
+        cursor: pointer !important;
+        font-size: 0.9em !important;
+        font-weight: 600 !important;
+        text-decoration: none !important;
+        transition:
+          background-color 0.2s ease,
+          transform 0.1s ease !important;
+      }
+
+      .btn-accept {
+        background-color: #28a745 !important; /* Green when enabled */
+        color: white !important;
+      }
+
+      .btn-accept:hover {
+        background-color: #218838 !important;
+        transform: translateY(-1px) !important;
+      }
+
+      /* Disabled state: gray and non-interactive */
+      .btn-accept:disabled,
+      .btn-accept[aria-disabled="true"] {
+        background-color: #9e9e9e !important;
+        cursor: not-allowed !important;
+        transform: none !important;
+      }
+
+      .btn-accept:disabled:hover,
+      .btn-accept[aria-disabled="true"]:hover {
+        background-color: #9e9e9e !important;
+        transform: none !important;
+      }
+
+      .btn-reject {
+        background-color: #dc3545 !important;
+        color: white !important;
+      }
+
+      .btn-reject:hover {
+        background-color: #c82333 !important;
+        transform: translateY(-1px) !important;
+      }
+
+      .btn-view {
+        background-color: #ffb64a !important;
+        color: white !important;
+      }
+
+      .btn-view:hover {
+        background-color: #e6a23c !important;
+        transform: translateY(-1px) !important;
+      }
+
+      .btn-checkout {
+        background-color: #17a2b8 !important;
+        color: white !important;
+      }
+
+      .btn-checkout:hover {
+        background-color: #138496 !important;
+        transform: translateY(-1px) !important;
+      }
+
+      .btn-checkin {
+        background-color: #20c997 !important;
+        color: white !important;
+      }
+
+      .btn-checkin:hover {
+        background-color: #1ea085 !important;
+        transform: translateY(-1px) !important;
+      }
+
+      /* Custom date inputs styling */
+      #customDateInputs {
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 4px;
+        border: 1px solid #e9ecef;
+        margin-top: 5px;
+      }
+
+      #customDateInputs input[type="date"] {
+        transition: border-color 0.3s ease;
+      }
+
+      #customDateInputs input[type="date"]:focus {
+        outline: none;
+        border-color: #ffb64a;
+        box-shadow: 0 0 0 2px rgba(255, 182, 74, 0.2);
+      }
+
+      .filter-group {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+
+      /* Enhanced table scrolling styles */
+      .table-container::-webkit-scrollbar {
+        width: 12px;
+        height: 12px;
+      }
+
+      .table-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 6px;
+      }
+
+      .table-container::-webkit-scrollbar-thumb {
+        background: #ffb64a;
+        border-radius: 6px;
+        border: 2px solid #f1f1f1;
+      }
+
+      .table-container::-webkit-scrollbar-thumb:hover {
+        background: #e6a23c;
+      }
+
+      .table-container::-webkit-scrollbar-corner {
+        background: #f1f1f1;
+      }
+
+      /* Ensure table cells don't wrap text */
+      .data-table td {
+        white-space: nowrap;
+        padding: 12px 15px;
+        border-bottom: 1px solid #e9ecef;
+      }
+
+      .data-table tbody tr:hover {
+        background-color: #f8f9fa;
+        transition: background-color 0.2s ease;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <div class="sidebar">
+        <h1>Admin</h1>
+        <p class="welcome-text">Welcome, admin</p>
+
+        <nav>
+          <a href="dashboard.html">Dashboard</a>
+          <a href="users.html">Users</a>
+          <a href="pets.html">Pets</a>
+          <a href="bookings.html" class="active">Pending Bookings</a>
+          <a href="bookings-approved.html">Bookings</a>
+
+          <div class="nav-item">
+            <a href="#" class="nav-link" id="reportsDropdown">Reports ▼</a>
+            <div class="submenu" id="reportsSubmenu">
+              <a href="booking-reports.html">Booking Reports</a>
+              <a href="feeding-reports.html">Feeding Reports</a>
+              <a href="sales-reports.html">Sales Reports</a>
+            </div>
+          </div>
+        </nav>
+
+        <a href="#" class="logout" id="logoutButton">Logout</a>
+      </div>
+
+      <div class="main-content">
+        <h1>Pending Bookings</h1>
+
+        <div
+          class="controls-container"
+          style="
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+          "
+        >
+          <div class="filter-group">
+            <label
+              for="statusFilter"
+              style="margin-right: 8px; font-weight: 500"
+              >Filter by Status:</label
+            >
+            <select
+              id="statusFilter"
+              style="
+                padding: 8px 12px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                background: white;
+              "
+            >
+              <option value="Pending">Pending</option>
+              <option value="Cancelled">Cancelled</option>
+              <option value="All">All Pending Bookings</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="dateFilter" style="margin-right: 8px; font-weight: 500"
+              >Filter by Date:</label
+            >
+            <select
+              id="dateFilter"
+              style="
+                padding: 8px 12px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                background: white;
+              "
+            >
+              <option value="all">All Dates</option>
+              <option value="today">Today</option>
+              <option value="tomorrow">Tomorrow</option>
+              <option value="next7days">Next 7 Days</option>
+              <option value="next30days">Next 30 Days</option>
+              <option value="past7days">Past 7 Days</option>
+              <option value="past30days">Past 30 Days</option>
+              <option value="custom">Custom Range</option>
+            </select>
+          </div>
+
+          <!-- Custom Date Range Inputs (initially hidden) -->
+          <div id="customDateInputs" class="filter-group" style="display: none">
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                flex-wrap: wrap;
+              "
+            >
+              <div style="display: flex; align-items: center">
+                <label
+                  for="startDate"
+                  style="
+                    margin-right: 8px;
+                    font-weight: 500;
+                    white-space: nowrap;
+                  "
+                  >From:</label
+                >
+                <input
+                  type="date"
+                  id="startDate"
+                  style="
+                    padding: 8px 12px;
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                    background: white;
+                  "
+                />
+              </div>
+              <div style="display: flex; align-items: center">
+                <label
+                  for="endDate"
+                  style="
+                    margin-right: 8px;
+                    font-weight: 500;
+                    white-space: nowrap;
+                  "
+                  >To:</label
+                >
+                <input
+                  type="date"
+                  id="endDate"
+                  style="
+                    padding: 8px 12px;
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                    background: white;
+                  "
+                />
+              </div>
+            </div>
+          </div>
+          <button
+            id="refreshBookingsBtn"
+            style="
+              padding: 8px 16px;
+              background: #ffb64a;
+              color: white;
+              border: none;
+              border-radius: 4px;
+              cursor: pointer;
+            "
+          >
+            Refresh
+          </button>
+          <button
+            id="showAllBookingsBtn"
+            style="
+              padding: 8px 16px;
+              background: #6c757d;
+              color: white;
+              border: none;
+              border-radius: 4px;
+              cursor: pointer;
+            "
+          >
+            Show All
+          </button>
+        </div>
+
+        <div
+          class="table-container"
+          style="
+            overflow: auto;
+            max-height: 70vh;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+          "
+        >
+          <table class="data-table" style="min-width: 1200px; width: 100%">
+            <thead
+              style="position: sticky; top: 0; background: #ffb64a; z-index: 10"
+            >
+              <tr>
+                <th style="padding: 15px 12px; white-space: nowrap">
+                  Booking ID
+                </th>
+                <th style="padding: 15px 12px; white-space: nowrap">
+                  Pet Name
+                </th>
+                <th style="padding: 15px 12px; white-space: nowrap">
+                  Owner Name
+                </th>
+                <th style="padding: 15px 12px; white-space: nowrap">
+                  Service Type
+                </th>
+                <th style="padding: 15px 12px; white-space: nowrap">
+                  Room Type
+                </th>
+                <th style="padding: 15px 12px; white-space: nowrap">
+                  Check-in Date
+                </th>
+                <th style="padding: 15px 12px; white-space: nowrap">
+                  Check-out Date
+                </th>
+                <th style="padding: 15px 12px; white-space: nowrap">Status</th>
+                <th style="padding: 15px 12px; white-space: nowrap">Actions</th>
+                <th style="padding: 15px 12px; white-space: nowrap">
+                  View Details
+                </th>
+              </tr>
+            </thead>
+            <tbody id="bookingsTableBody">
+              <tr>
+                <td colspan="10" style="text-align: center; padding: 20px">
+                  Loading pending bookings...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- View Details Modal Structure -->
+    <div id="viewDetailsModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modalHeader">Booking Details</h2>
+          <button id="modalCloseBtn" class="close-button">&times;</button>
+        </div>
+        <div class="modal-body" id="bookingDetailsContent">
+          <!-- Content will be loaded here by JavaScript -->
+        </div>
+        <div class="modal-footer">
+          <button id="modalCloseBtnFooter" class="btn btn-secondary">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+    <div id="overlay" class="overlay"></div>
+
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/modal_handler.js"></script>
+    <script type="module" src="js/booking.js"></script>
+    <script type="module">
+      import { initializeLogout } from "./js/logout-handler.js";
+      initializeLogout();
+    </script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const reportsDropdown = document.getElementById("reportsDropdown");
+        const reportsSubmenu = document.getElementById("reportsSubmenu");
+
+        // Only handle reports dropdown clicks
+        reportsDropdown.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation(); // Prevent event bubbling
+          reportsSubmenu.classList.toggle("active");
+
+          // Change arrow direction
+          if (reportsSubmenu.classList.contains("active")) {
+            reportsDropdown.innerHTML = "Reports ▲";
+          } else {
+            reportsDropdown.innerHTML = "Reports ▼";
+          }
+        });
+
+        // Close submenu when clicking outside the reports section specifically
+        document.addEventListener("click", function (e) {
+          // Only close if clicking outside the reports dropdown area
+          if (
+            !e.target.closest("#reportsDropdown") &&
+            !e.target.closest("#reportsSubmenu")
+          ) {
+            reportsSubmenu.classList.remove("active");
+            reportsDropdown.innerHTML = "Reports ▼";
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

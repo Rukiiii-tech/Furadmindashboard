@@ -1,0 +1,56 @@
+/* Feeding Reports Page Specific Styles */
+
+/* Status styles (if still needed, otherwise rely on tables.css .status-badge) */
+.status.done {
+  background-color: #e8f5e9; /* Light green */
+  color: #2e7d32; /* Darker green */
+}
+
+.status.pending {
+  background-color: #fff3e0; /* Light orange */
+  color: #f57c00; /* Darker orange */
+}
+
+/* Table specific column styles */
+/* Changed .users-table to .data-table to match HTML*/
+.data-table td {
+  vertical-align: middle;
+}
+
+/* Food type column (assuming it's the 4th logical column in feeding-reports.html) */
+.data-table td:nth-child(4) {
+  /* This is for Food Type */
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+
+/* Quantity column (assuming it's the 5th logical column) */
+.data-table td:nth-child(5) {
+  /* This is for Quantity */
+  font-size: 14px;
+}
+
+/* Feeding time column (assuming it's the 6th logical column) */
+.data-table td:nth-child(6) {
+  /* This is for Feeding Time */
+  font-family: monospace;
+  font-size: 14px;
+}
+
+/* Responsive adjustments for specific columns */
+@media (max-width: 768px) {
+  /* The general .status-badge responsive styles are in tables.css */
+  .status.done,
+  .status.pending {
+    /* Apply smaller size for page-specific status */
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+
+  .data-table td:nth-child(4), /* Food Type */
+  .data-table td:nth-child(5), /* Quantity */
+  .data-table td:nth-child(6) {
+    /* Feeding Time */
+    font-size: 12px;
+  }
+}

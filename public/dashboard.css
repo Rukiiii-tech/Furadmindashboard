@@ -1,0 +1,152 @@
+/* Dashboard Specific Styles (Only what's unique to dashboard layout/stats) */
+
+/* Inherits from style.css: body, dashboard-container, sidebar, welcome-text, sidebar nav, logout, main-content, main-content h1 */
+
+/* Dashboard Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 30px;
+  padding: 0 20px; /* Added padding for consistency */
+}
+
+.stat-card {
+  padding: 14px;
+  border-radius: 12px;
+  min-height: 90px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card h3 {
+  font-size: 15px;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.stat-number {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* Stat card logo/icon */
+.stat-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+/* Stat Card Colors */
+.stat-users {
+  background-color: #3bc3ec; /* Success Green */
+}
+
+.stat-pending {
+  background-color: rgb(0, 255, 157); /* Danger Red */
+}
+
+.stat-feeding {
+  background-color: #f1c40f; /* Warning Yellow */
+}
+
+.stat-pets {
+  background-color: #b4a597; /* Muted Brown/Grey */
+}
+
+.stat-booked {
+  background-color: #bdc3c7; /* Light Grey/Blue */
+}
+
+.stat-weekly-sales {
+  background-color: #b2ccdd; /* Light Grey/Blue */
+}
+
+/* Chart Container (if any dashboard chart is used) */
+.chart-container {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 30px;
+  min-height: 450px;
+  width: 100%;
+  position: relative;
+}
+
+#bookingChart {
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+}
+
+/* D3 Chart Specific Styles (if applicable) */
+.bar {
+  transition: all 0.3s ease;
+}
+
+.label {
+  font-family: Arial, sans-serif;
+  font-weight: 500;
+}
+
+/* Ensure SVG takes full width */
+#bookingChart svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Responsive adjustments for Dashboard */
+@media (max-width: 1200px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  /* Inherits flex-direction: column for dashboard-container from style.css */
+  /* Inherits padding for sidebar and main-content from style.css */
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 0 10px;
+  }
+
+  .stat-card {
+    min-height: 70px;
+    padding: 10px;
+  }
+
+  .stat-card h3 {
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+
+  .stat-number {
+    font-size: 18px;
+  }
+
+  .chart-container {
+    margin: 15px -15px; /* Adjust margins to full width on small screens */
+    padding: 15px;
+    border-radius: 0;
+  }
+}

@@ -1,0 +1,800 @@
+/* Make all text on the website black */
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+label,
+span,
+div,
+a,
+th,
+td,
+input,
+select,
+button,
+li,
+ul,
+ol,
+strong,
+em,
+b,
+i {
+  color: #000 !important;
+}
+
+/* Make all button text white */
+button,
+.action-btn,
+.btn-primary,
+.btn-secondary,
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+  color: black !important;
+}
+
+/* General Body and Container Styles */
+* {
+  margin: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  background: linear-gradient(
+      rgba(245, 245, 245, 0.92),
+      rgba(245, 245, 245, 0.92)
+    ),
+    url("./image/cage.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  font-family: "Arial", sans-serif;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 100vh;
+  padding: 40px;
+  gap: 60px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.left-section {
+  flex: 1;
+  max-width: 600px;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.business-info {
+  color: #2c3e50;
+  max-width: 600px;
+  width: 100%;
+}
+
+.business-info h1 {
+  font-size: 2.5em;
+  margin-bottom: 20px;
+  color: #2c3e50;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.business-info p {
+  margin: 15px 0;
+  font-size: 1.1em;
+  line-height: 1.8;
+  color: #34495e;
+}
+
+/* Login/Register Container Styles */
+.login-container,
+.register-container {
+  width: 400px;
+  min-height: 450px;
+  padding: 50px;
+  background: #ffb64a;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border: none;
+  order: 0;
+}
+
+.register-container {
+  min-height: 600px; /* Taller for more form fields */
+}
+
+.logo {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.logo h2 {
+  color: #000000;
+  font-size: 1.8em;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  margin-bottom: 0;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  color: #2c3e50;
+  transition: all 0.3s ease;
+  background: #ffffff;
+}
+
+.form-group input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+.login-btn,
+.register-btn {
+  width: 100%;
+  padding: 14px;
+
+  color: #ffb64a;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.login-btn:hover,
+.register-btn:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-1px);
+}
+
+.register-link,
+.login-link {
+  text-align: center;
+  margin-top: 20px;
+  color: #ffffff;
+}
+
+.register-link a,
+.login-link a {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.register-link a:hover,
+.login-link a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+/* Dashboard Layout */
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  width: 250px;
+  background-color: #ffb64a;
+  padding: 20px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar h1 {
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+
+.welcome-text {
+  font-size: 14px;
+  margin-bottom: 30px;
+  opacity: 0.9;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.sidebar nav a {
+  color: white;
+  font-size: large;
+  text-decoration: none;
+  padding: 12px 15px;
+  border-radius: 10px;
+  transition: background-color 0.3s;
+  font-weight: 400;
+  gap: 10px;
+}
+
+.sidebar nav a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar nav a.active {
+  background-color: white;
+  color: #333;
+}
+
+/* Sub-menu Styles */
+.nav-item {
+  position: relative;
+  margin: 8px 0;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  color: #2c3e50;
+  text-decoration: none;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 6px;
+  margin: 0;
+  font-weight: 500;
+  font-size: 15px;
+  border: 1px solid transparent;
+}
+
+.nav-link:hover {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-color: #2196f3;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(33, 150, 243, 0.2);
+}
+
+.submenu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  border-radius: 8px;
+  margin: 4px 0;
+  overflow: hidden;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  margin-bottom: 15px;
+}
+
+.submenu.active {
+  display: block;
+  animation: slideDown 0.3s ease-out;
+  margin-bottom: 10px;
+}
+
+.submenu a {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px 12px 25px;
+  color: #2c3e50;
+  text-decoration: none;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 14px;
+  font-weight: 400;
+  position: relative;
+  margin-left: 15px;
+}
+
+.submenu a:last-child {
+  border-bottom: none;
+}
+
+.submenu a:hover {
+  background: linear-gradient(135deg, #e3f2fd 0%);
+  color: #1976d2;
+  padding-left: 30px;
+  transform: translateX(5px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.submenu a.active {
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  transform: translateX(5px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.submenu a.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(135deg, #ffb64a 0%, #ff9800 100%);
+  animation: slideInLeft 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.logout {
+  margin-top: auto;
+  color: white;
+  text-decoration: none;
+  padding: 12px 15px;
+  border-radius: 10px;
+  width: fit-content;
+  align-self: center;
+}
+
+.logout:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  padding: 20px;
+  background-color: #f5f5f5;
+}
+
+/* Page Headers */
+.main-content h1 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+/* Chart Styles (Placeholder, if used) */
+.chart-container {
+  margin-top: 20px;
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  height: 300px;
+}
+
+/* Action Buttons (General) */
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+/* Page Headers (Specific to pages with add buttons/filters) */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.page-header h1 {
+  font-size: 24px;
+  color: #333;
+}
+
+/* Add New Button */
+.btn-add {
+  background-color: #2ecc71;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-add:hover {
+  background-color: #27ae60;
+}
+
+/* Search and Filter Section */
+.filters-section {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding: 0 20px;
+}
+
+.search-box {
+  flex: 1;
+  max-width: 300px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.filter-box select {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  background-color: white;
+}
+
+/* Form Styles */
+.form-container {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* Room Card Styles (from dashboard.css, now generalized if used outside dashboard) */
+.rooms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.room-card {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.room-card-image {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+.room-card-content {
+  padding: 15px;
+}
+
+.room-card h3 {
+  margin: 0 0 10px 0;
+  color: #333;
+}
+
+.room-card p {
+  margin: 5px 0;
+  color: #666;
+}
+
+.room-status {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 12px;
+  margin-top: 10px;
+}
+
+.room-available {
+  background-color: #2ecc71;
+  color: white;
+}
+
+.room-occupied {
+  background-color: #e74c3c;
+  color: white;
+}
+
+/* Loading State */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.loading-spinner::after {
+  content: "";
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #ffb64a;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive Design (General) */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    padding: 20px;
+    gap: 30px;
+  }
+
+  .left-section {
+    padding: 20px;
+    order: -1;
+  }
+
+  .login-container,
+  .register-container {
+    width: 100%;
+    max-width: 400px;
+    margin: 10px 0;
+    padding: 30px;
+  }
+
+  .register-container {
+    min-height: 550px;
+  }
+
+  .business-info h1 {
+    font-size: 2em;
+  }
+
+  .business-info p {
+    font-size: 1em;
+  }
+
+  .dashboard-container {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    padding: 15px;
+  }
+
+  .main-content {
+    padding: 15px;
+  }
+
+  .filters-section {
+    flex-direction: column;
+  }
+
+  .search-box {
+    max-width: 100%;
+  }
+
+  .rooms-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* --- ADDITIONS/MODIFICATIONS FOR MODALS (Moved from old style.css, integrated with modal.css structure) --- */
+
+/* Modal main content - Basic container styles that might be in style.css */
+/* I recommend keeping these in modal.css for better organization */
+/* For now, ensuring no conflicts */
+/* .modal-content is now heavily styled in modal.css */
+
+/* Info section - GENERAL STYLES FOR INFO SECTIONS (NOT SPECIFICALLY MODALS) */
+/* The styles for .info-section inside .modal-body are now handled in modal.css */
+.info-section {
+  /* This is for cases where info-section is outside a modal, e.g., user profiles */
+  background: #fff8ee;
+  border: 1.5px solid #ffb64a;
+  border-radius: 12px;
+  margin: 32px auto; /* Centered if used standalone */
+  padding: 28px 24px 18px 24px;
+  box-shadow: 0 2px 8px rgba(255, 182, 74, 0.07);
+  max-width: 600px; /* Example max-width if used outside modal */
+}
+
+.info-section h3 {
+  color: #222;
+  font-size: 1.08em;
+  font-weight: 700;
+  margin-bottom: 18px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-bottom: 2px solid #ffb64a;
+  padding-bottom: 8px;
+}
+
+/* Info group */
+.info-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 18px;
+}
+
+.info-group label {
+  font-size: 0.92em;
+  color: #ffb64a;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+
+.info-group input,
+.info-group span {
+  background: #fff;
+  border: 1px solid #ffe0a3;
+  border-radius: 7px;
+  padding: 10px 12px;
+  font-size: 1em;
+  color: #333;
+  font-weight: 500;
+  outline: none;
+  margin-bottom: 0;
+  transition: border 0.2s;
+}
+
+.info-group input:focus {
+  border: 1.5px solid #ffb64a;
+}
+
+.info-group span {
+  display: block;
+  background: #fff;
+  border: 1px solid #ffe0a3;
+}
+
+.info-group a {
+  color: #ffb64a;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.info-group a:hover {
+  color: #e6a43a;
+  text-decoration: underline;
+}
+
+/* Responsive for mobile (general info sections) */
+@media (max-width: 600px) {
+  .info-section {
+    margin: 18px 6px 0 6px;
+    padding: 18px 8px 10px 8px;
+  }
+}
+
+/* This rule below was for images within .info-group, but now images are in .image-container */
+/* and styled more specifically in modal.css for modal context */
+/* .info-group img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 10px 0;
+  border-radius: 6px;
+  border: 1px solid #eee;
+} */
+
+/* Booking Status Management Section (kept in style.css if it's not a modal-specific component) */
+.status-management-section {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.status-management-section h4 {
+  font-size: 1.1em;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.status-management-section .status-select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1em;
+  background-color: white;
+  width: 100%;
+  max-width: 250px;
+}
+
+.status-management-section textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1em;
+  min-height: 80px;
+  resize: vertical;
+}
+
+.status-management-section .btn-primary {
+  align-self: flex-end; /* Align button to the right */
+  padding: 10px 20px;
+  font-size: 1.05em;
+}
