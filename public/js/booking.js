@@ -585,9 +585,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     await showCheckoutModal(bookingId);
   };
 
-  // Initial render of the table when the DOM is ready
-  // renderBookingsTable(); // Called earlier now
-
   /**
    * Fetches and displays comprehensive details for a given booking ID using a modal.
    * It first checks a local cache, then falls back to Firestore if not found.
@@ -624,11 +621,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       console.log("Booking data found in cache:", bookingData);
     }
 
-    // --- FIX: Define customerName here ---
+    // --- FIX: Define customerName here to resolve ReferenceError ---
     const customerName = bookingData.ownerInformation
       ? `${bookingData.ownerInformation.firstName || ""} ${bookingData.ownerInformation.lastName || ""}`.trim()
       : "N/A";
-    // -------------------------------------
+    // ---------------------------------------------------------------
 
     // --- Construct the HTML for the modal content ---
     let detailsHtml = `
@@ -1202,16 +1199,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (typeof weightKg !== "number" || isNaN(weightKg)) {
       return "N/A";
     }
+    // Using simple weight categories for the sake of consistency with existing code's logic
     if (weightKg < 10) return "Small";
-    if (weightKg >= 10.1 && weightKg <= 26) return "Medium"; // Adjusted range for 10.1 to 26
-    if (weightKg >= 26.1 && weightKg <= 34) return "Large"; // Adjusted range for 26.1 to 34
-    if (weightKg >= 34.1 && weightKg <= 38) return "XL"; // Adjusted range for 34.1 to 38
+    if (weightKg >= 10.1 && weightKg <= 26) return "Medium";
+    if (weightKg >= 26.1 && weightKg <= 34) return "Large";
+    if (weightKg >= 34.1 && weightKg <= 38) return "XL";
     if (weightKg > 38) return "XXL";
     return "N/A"; // Fallback for weights outside defined ranges
   }
 
-  // --- START FIX for ReferenceError: applyFilters is not defined ---
-  // The refresh functions are now defined inside DOMContentLoaded where applyFilters is accessible.
+  // --- Real-Time Refresh Functions (Ensuring proper scope access to applyFilters) ---
 
   /**
    * Starts the real-time refresh functionality
@@ -1227,10 +1224,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       try {
         console.log("Auto-refreshing bookings data...");
 
-        // FIX: applyFilters is now accessible here
+        // applyFilters is accessible because this function is defined inside DOMContentLoaded
         await applyFilters();
       } catch (error) {
-        // FIX: applyFilters is not the error, but this catch handles runtime errors inside the interval
         console.error("Error during auto-refresh:", error);
       }
     }, 30000); // 30 seconds
@@ -1259,11 +1255,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Start real-time refresh (every 30 seconds)
   startRealTimeRefresh();
-  // --- END FIX for ReferenceError: applyFilters is not defined ---
 
   // Removed rejection monitoring - no longer needed
 
   // Initialize acceptance monitoring
   initializeAcceptanceMonitoring();
 });
-// The code outside of the DOMContentLoaded listener has been removed as it was moved inside.
