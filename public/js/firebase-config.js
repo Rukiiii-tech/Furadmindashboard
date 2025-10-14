@@ -1,12 +1,12 @@
-// Import Firebase SDK modules from version 11.9.0
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-analytics.js";
+// Import Firebase SDK modules from version 12.4.0
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-analytics.js";
 import {
   getAuth,
   signInWithEmailAndPassword,
   onAuthStateChanged,
   signOut,
-} from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 import {
   getFirestore,
   collection,
@@ -23,7 +23,7 @@ import {
   where,
   deleteDoc,
   addDoc,
-} from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
