@@ -736,11 +736,28 @@
                     />
                   </div>
                 </th>
+                <!-- NEW RECEIPT COLUMN -->
+                <th
+                  class="data-column no-print"
+                  data-column="receipt"
+                  data-name="Receipt"
+                  style="padding: 15px 12px; white-space: nowrap"
+                >
+                  <div class="column-header-content">
+                    Receipt
+                    <!-- Receipt column is always an action, so we don't need a print checkbox, but need the data-column attribute -->
+                    <input
+                      type="checkbox"
+                      class="column-select-checkbox no-print"
+                      data-column-key="receipt"
+                    />
+                  </div>
+                </th>
               </tr>
             </thead>
             <tbody id="salesTableBody">
               <tr>
-                <td colspan="12" style="text-align: center; padding: 20px">
+                <td colspan="13" style="text-align: center; padding: 20px">
                   Loading sales reports...
                 </td>
               </tr>

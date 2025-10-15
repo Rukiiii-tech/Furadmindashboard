@@ -157,7 +157,7 @@ async function loadSalesData() {
   try {
     salesTableBody.innerHTML = `
       <tr>
-        <td colspan="12" style="text-align: center; padding: 20px;">
+        <td colspan="13" style="text-align: center; padding: 20px;">
           Loading transaction data...
         </td>
       </tr>
@@ -264,7 +264,7 @@ async function loadSalesData() {
     console.error("Error loading sales data from bookings collection:", error);
     salesTableBody.innerHTML = `
       <tr>
-        <td colspan="12" style="text-align: center; padding: 20px; color: red;">
+        <td colspan="13" style="text-align: center; padding: 20px; color: red;">
           Error loading transaction data. Please check the browser console for details (F12).
         </td>
       </tr>
@@ -277,7 +277,7 @@ function displaySalesData(salesData) {
   if (salesData.length === 0) {
     salesTableBody.innerHTML = `
       <tr>
-        <td colspan="12" style="text-align: center; padding: 20px;">
+        <td colspan="13" style="text-align: center; padding: 20px;">
           No transaction data found.
         </td>
       </tr>
@@ -310,6 +310,11 @@ function displaySalesData(salesData) {
             ${sale.checkoutStatus}
           </span>
         </td>
+        <td data-column="receipt" class="no-print">
+            <button class="action-btn btn-view" onclick="showReceiptModal('${sale.id}')">
+                Receipt
+            </button>
+        </td>
       </tr>
     `
     )
@@ -331,6 +336,239 @@ function formatDate(dateString) {
     day: "numeric",
   });
 }
+
+// Format date and time for receipt
+function formatDateTime(dateString) {
+  if (!dateString) return "N/A";
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) {
+    return "Invalid Date";
+  }
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+}
+
+// Format currency
+function formatCurrency(amount) {
+  if (typeof amount !== "number" || isNaN(amount)) return "₱0.00";
+  return `₱${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+// =========================================================================
+// NEW FUNCTION: showReceiptModal
+// =========================================================================
+
+/**
+ * Displays a print-friendly receipt modal for a specific sales transaction.
+ * @param {string} saleId - The ID of the sales object.
+ */
+window.showReceiptModal = function (saleId) {
+  const sale = allProcessedSalesData.find((s) => s.id === saleId);
+  if (!sale || !sale.fullBookingData) {
+    console.error(
+      "Invalid sale object provided for receipt generation:",
+      saleId
+    );
+    return;
+  }
+
+  const bookingData = sale.fullBookingData;
+
+  // Format relevant dates
+  const transactionDate = formatDateTime(sale.date);
+  const checkInDate = formatDate(
+    bookingData.boardingDetails?.checkInDate ||
+      bookingData.groomingDetails?.groomingCheckInDate ||
+      sale.date
+  );
+  const checkOutDate =
+    sale.serviceType === "Boarding"
+      ? formatDate(bookingData.boardingDetails?.checkOutDate)
+      : "N/A";
+
+  // Determine service details based on type
+  let serviceDetailsHtml = "";
+  let subTotal = sale.totalAmount;
+  let serviceDuration = "N/A";
+
+  if (sale.serviceType === "Boarding") {
+    const checkIn = new Date(bookingData.boardingDetails?.checkInDate);
+    const checkOut = new Date(bookingData.boardingDetails?.checkOutDate);
+    if (!isNaN(checkIn.getTime()) && !isNaN(checkOut.getTime())) {
+      const diffTime = checkOut.getTime() - checkIn.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      serviceDuration = `${diffDays} Day(s) Stay`;
+      // Note: Since Boarding uses a single-day rate for Checked-Out status, we show the duration but
+      // explicitly state the unit price is the daily rate (PXXX) based on the size category.
+    }
+    serviceDetailsHtml = `
+          <div class="receipt-item">
+              <span class="item-name">Boarding Service (${sale.petSize} Pet)</span>
+              <span class="item-price">${formatCurrency(sale.totalAmount)}</span>
+          </div>
+          <div class="receipt-item sub-detail">
+              <span class="item-name">- ${bookingData.boardingDetails?.selectedRoomType || "Standard Room"}</span>
+              <span class="item-price"></span>
+          </div>
+      `;
+  } else if (sale.serviceType === "Grooming") {
+    serviceDuration = "1 Session";
+    serviceDetailsHtml = `
+          <div class="receipt-item">
+              <span class="item-name">Grooming Service (${sale.petSize} Pet)</span>
+              <span class="item-price">${formatCurrency(sale.totalAmount)}</span>
+          </div>
+      `;
+  }
+
+  // Build the receipt HTML content
+  const receiptHtml = `
+    <div class="receipt-content-wrapper" id="receiptPrintTarget">
+      <div class="receipt-print-area">
+        <div class="receipt-header" style="text-align: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #333;">
+          <h2 style="color: #000; margin: 0; font-size: 1.8em; font-weight: bold;">FURRY TAILS</h2>
+          <p style="margin: 5px 0 0 0; font-size: 0.9em;">Meycauayan Pet Hotel & Grooming Center</p>
+          <p style="margin: 0; font-size: 0.8em;">Receipt No: #${sale.transactionID}</p>
+          <p style="margin: 0; font-size: 0.8em;">Date: ${transactionDate}</p>
+        </div>
+
+        <div class="receipt-section customer-info" style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dashed #ccc;">
+          <h4 style="margin-top: 0; margin-bottom: 10px; font-size: 1.1em; font-weight: bold;">Transaction Summary</h4>
+          <div class="info-line">
+            <span class="info-label">Customer:</span>
+            <span class="info-value">${sale.customerName}</span>
+          </div>
+          <div class="info-line">
+            <span class="info-label">Pet Name:</span>
+            <span class="info-value">${bookingData.petInformation?.petName || "N/A"} (${sale.petSize})</span>
+          </div>
+          <div class="info-line">
+            <span class="info-label">Service Type:</span>
+            <span class="info-value">${sale.serviceType} (${serviceDuration})</span>
+          </div>
+          <div class="info-line">
+            <span class="info-label">Start Date:</span>
+            <span class="info-value">${checkInDate}</span>
+          </div>
+          ${
+            sale.serviceType === "Boarding"
+              ? `
+          <div class="info-line">
+            <span class="info-label">End Date:</span>
+            <span class="info-value">${checkOutDate}</span>
+          </div>`
+              : ""
+          }
+        </div>
+        
+        <h4 style="margin-top: 0; margin-bottom: 10px; font-size: 1.1em; font-weight: bold;">Charges</h4>
+        <div class="receipt-charges" style="margin-bottom: 15px; border-bottom: 1px dashed #ccc; padding-bottom: 10px;">
+            ${serviceDetailsHtml}
+        </div>
+        
+        <div class="receipt-totals">
+            <div class="total-line sub-total">
+                <span>Subtotal:</span>
+                <span>${formatCurrency(subTotal)}</span>
+            </div>
+            <div class="total-line down-payment">
+                <span>Less: Down Payment:</span>
+                <span>(${formatCurrency(sale.downPayment)})</span>
+            </div>
+            <div class="total-line balance-due" style="border-top: 2px solid #333; margin-top: 10px; padding-top: 10px;">
+                <span style="font-size: 1.2em; font-weight: bold;">Amount Due:</span>
+                <span style="font-size: 1.2em; font-weight: bold;">${formatCurrency(sale.balance)}</span>
+            </div>
+            
+            <div class="total-line final-status" style="margin-top: 20px; padding: 10px; background: #e8f5e9; border-radius: 4px;">
+                <span style="font-weight: bold; color: #2e7d32;">Payment Status:</span>
+                <span style="font-weight: bold; color: #2e7d32;">${sale.paymentStatus} via ${sale.paymentMethod}</span>
+            </div>
+        </div>
+
+        <div class="receipt-footer" style="text-align: center; margin-top: 30px; border-top: 1px solid #ccc; padding-top: 10px; font-size: 0.8em;">
+            <p>Thank you for choosing Furry Tails!</p>
+            <p>Admin: ${bookingData.ownerInformation?.firstName} ${bookingData.ownerInformation?.lastName}</p>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Use the existing generic modal handler
+  showGenericModal(
+    document.getElementById("detailsModal"),
+    `Receipt - #${sale.transactionID}`,
+    receiptHtml
+  );
+
+  // Custom button for printing the modal content
+  const modalFooter = document
+    .getElementById("detailsModal")
+    .querySelector(".modal-footer");
+  // Clear the default Close button added by showGenericModal
+  modalFooter.innerHTML = "";
+
+  const closeButton = document.createElement("button");
+  closeButton.className = "btn btn-secondary action-btn";
+  closeButton.textContent = "Close";
+  closeButton.addEventListener("click", () =>
+    window.hideGenericModal(document.getElementById("detailsModal"))
+  );
+
+  const printButton = document.createElement("button");
+  printButton.className = "btn btn-primary action-btn";
+  printButton.textContent = "Print Receipt";
+  printButton.style.marginLeft = "10px";
+  printButton.addEventListener("click", () =>
+    printReceiptContent("receiptPrintTarget")
+  );
+
+  modalFooter.appendChild(closeButton);
+  modalFooter.appendChild(printButton);
+};
+
+// =========================================================================
+// NEW FUNCTION: printReceiptContent
+// This function handles the printing of the specific receipt HTML content
+// using the existing print infrastructure
+// =========================================================================
+window.printReceiptContent = function (elementId) {
+  const contentToPrint = document.getElementById(elementId);
+  if (!contentToPrint) {
+    console.error("Element to print not found:", elementId);
+    return;
+  }
+
+  // Save current body content
+  const originalBodyContent = document.body.innerHTML;
+
+  // Create a temporary container for printing, specifically marked with the print-only class
+  const printWrapper = document.createElement("div");
+  printWrapper.className = "receipt-print-wrapper print-only";
+
+  // Clone the receipt content and append it to the wrapper
+  printWrapper.appendChild(contentToPrint.cloneNode(true));
+
+  // Replace body content
+  document.body.innerHTML = "";
+  document.body.appendChild(printWrapper);
+
+  // Call print
+  window.print();
+
+  // Restore original content after a slight delay
+  setTimeout(() => {
+    document.body.innerHTML = originalBodyContent;
+    // Re-establish event listeners by reloading data
+    loadSalesData();
+  }, 500);
+};
 
 // Handle date filter change to show/hide custom date inputs
 function handleDateFilterChange() {
@@ -506,6 +744,11 @@ window.viewSaleDetails = function (saleId) {
         <div class="info-group">
           <label>Payment Status:</label>
           <span class="status-badge status-${(sale.paymentStatus || "unpaid").toLowerCase()}">${sale.paymentStatus || "Unpaid"}</span>
+        </div>
+        <div class="info-group">
+            <button class="action-btn btn-primary" onclick="window.showReceiptModal('${sale.id}')">
+                <span style="color:white !important;">View & Print Receipt</span>
+            </button>
         </div>
       </div>
   `;
@@ -942,7 +1185,8 @@ function handlePrintSelectedRows() {
 
     const columnKey = originalTh.getAttribute("data-column");
 
-    if (selectedColumnKeys.includes(columnKey)) {
+    // Check if the column is selected AND is not the 'receipt' action column
+    if (selectedColumnKeys.includes(columnKey) && columnKey !== "receipt") {
       const printTh = document.createElement("th");
       // Get the text content, ignoring the checkbox
       const headerText = originalTh.textContent.trim();
@@ -970,7 +1214,8 @@ function handlePrintSelectedRows() {
 
       const columnKey = originalTd.getAttribute("data-column");
 
-      if (selectedColumnKeys.includes(columnKey)) {
+      // Check if the column is selected AND is not the 'receipt' action column
+      if (selectedColumnKeys.includes(columnKey) && columnKey !== "receipt") {
         const printTd = document.createElement("td");
         // Clone the content (including inner spans/badges)
         printTd.innerHTML = originalTd.innerHTML;

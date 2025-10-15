@@ -36,6 +36,77 @@
     overflow: visible !important;
   }
 
+  /* --- Receipt-Specific Print Styles --- */
+  .receipt-print-wrapper {
+    width: 300px; /* Standard receipt paper width, adjust as needed */
+    margin: 0 auto;
+    padding: 10px;
+    color: #000;
+    font-family: monospace, sans-serif;
+    font-size: 11px;
+  }
+
+  .receipt-print-area {
+    page-break-after: always; /* Each receipt starts on a new page */
+    padding: 10px 0;
+  }
+
+  .receipt-header,
+  .receipt-section,
+  .receipt-totals {
+    font-size: 1em;
+  }
+
+  .receipt-header h2 {
+    font-size: 1.5em !important;
+    font-weight: bold !important;
+    margin-bottom: 5px !important;
+  }
+
+  .info-line {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 3px;
+  }
+
+  .info-line .info-label {
+    font-weight: bold;
+  }
+
+  .receipt-charges {
+    border-bottom: 1px dashed #000 !important;
+    padding-bottom: 5px !important;
+    margin-bottom: 5px !important;
+  }
+
+  .receipt-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+  }
+
+  .receipt-item .item-name {
+    text-align: left;
+  }
+
+  .receipt-item .item-price {
+    text-align: right;
+  }
+
+  .receipt-totals .total-line {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+  }
+
+  .receipt-totals .balance-due {
+    border-top: 1px solid #000 !important;
+    padding-top: 5px !important;
+    font-size: 1.1em;
+    font-weight: bold;
+  }
+
+  /* Existing table print styles */
   .print-header {
     margin-bottom: 10px;
     padding-bottom: 10px;
