@@ -14,10 +14,10 @@ let isShowingNotification = false;
 export function showRefreshIndicator(message = "Refreshing data...") {
   // Remove existing indicator if any
   hideRefreshIndicator();
-  
+
   // Create indicator element
-  refreshIndicator = document.createElement('div');
-  refreshIndicator.id = 'refreshIndicator';
+  refreshIndicator = document.createElement("div");
+  refreshIndicator.id = "refreshIndicator";
   refreshIndicator.style.cssText = `
     position: fixed;
     bottom: 20px;
@@ -39,7 +39,7 @@ export function showRefreshIndicator(message = "Refreshing data...") {
     max-width: 300px;
     border-left: 4px solid #2c5aa0;
   `;
-  
+
   // Add refresh icon
   refreshIndicator.innerHTML = `
     <div style="
@@ -52,9 +52,9 @@ export function showRefreshIndicator(message = "Refreshing data...") {
     "></div>
     <span>${message}</span>
   `;
-  
+
   // Add CSS animation
-  const style = document.createElement('style');
+  const style = document.createElement("style");
   style.textContent = `
     @keyframes spin {
       0% { transform: rotate(0deg); }
@@ -62,15 +62,15 @@ export function showRefreshIndicator(message = "Refreshing data...") {
     }
   `;
   document.head.appendChild(style);
-  
+
   // Add to page
   document.body.appendChild(refreshIndicator);
-  
+
   // Animate in
   setTimeout(() => {
     if (refreshIndicator) {
-      refreshIndicator.style.opacity = '1';
-      refreshIndicator.style.transform = 'translateY(0)';
+      refreshIndicator.style.opacity = "1";
+      refreshIndicator.style.transform = "translateY(0)";
     }
   }, 10);
 }
@@ -80,9 +80,9 @@ export function showRefreshIndicator(message = "Refreshing data...") {
  */
 export function hideRefreshIndicator() {
   if (refreshIndicator) {
-    refreshIndicator.style.opacity = '0';
-    refreshIndicator.style.transform = 'translateY(100%)';
-    
+    refreshIndicator.style.opacity = "0";
+    refreshIndicator.style.transform = "translateY(100%)";
+
     setTimeout(() => {
       if (refreshIndicator && refreshIndicator.parentNode) {
         refreshIndicator.parentNode.removeChild(refreshIndicator);
@@ -98,9 +98,9 @@ export function hideRefreshIndicator() {
  */
 export function showSuccessIndicator(message = "Data updated!") {
   hideRefreshIndicator();
-  
-  refreshIndicator = document.createElement('div');
-  refreshIndicator.id = 'successIndicator';
+
+  refreshIndicator = document.createElement("div");
+  refreshIndicator.id = "successIndicator";
   refreshIndicator.style.cssText = `
     position: fixed;
     bottom: 20px;
@@ -122,7 +122,7 @@ export function showSuccessIndicator(message = "Data updated!") {
     max-width: 300px;
     border-left: 4px solid #1e7e34;
   `;
-  
+
   refreshIndicator.innerHTML = `
     <div style="
       width: 16px;
@@ -137,17 +137,17 @@ export function showSuccessIndicator(message = "Data updated!") {
     ">✓</div>
     <span>${message}</span>
   `;
-  
+
   document.body.appendChild(refreshIndicator);
-  
+
   // Animate in
   setTimeout(() => {
     if (refreshIndicator) {
-      refreshIndicator.style.opacity = '1';
-      refreshIndicator.style.transform = 'translateY(0)';
+      refreshIndicator.style.opacity = "1";
+      refreshIndicator.style.transform = "translateY(0)";
     }
   }, 10);
-  
+
   // Auto hide after 3 seconds
   setTimeout(() => {
     hideRefreshIndicator();
@@ -160,14 +160,14 @@ export function showSuccessIndicator(message = "Data updated!") {
  * @param {string} type - The notification type (success, info, warning, error)
  * @param {number} duration - How long to show the notification (in milliseconds)
  */
-export function showNotification(message, type = 'info', duration = 3000) {
+export function showNotification(message, type = "info", duration = 3000) {
   const notification = {
     id: Date.now(),
     message,
     type,
-    duration
+    duration,
   };
-  
+
   notificationQueue.push(notification);
   processNotificationQueue();
 }
@@ -179,24 +179,24 @@ function processNotificationQueue() {
   if (isShowingNotification || notificationQueue.length === 0) {
     return;
   }
-  
+
   const notification = notificationQueue.shift();
   isShowingNotification = true;
-  
+
   // Create notification element
-  const notificationElement = document.createElement('div');
+  const notificationElement = document.createElement("div");
   notificationElement.id = `notification-${notification.id}`;
-  
+
   // Get colors based on type
   const colors = {
-    success: { bg: '#28a745', border: '#1e7e34', icon: '✓' },
-    info: { bg: '#17a2b8', border: '#117a8b', icon: 'ℹ' },
-    warning: { bg: '#ffc107', border: '#d39e00', icon: '⚠' },
-    error: { bg: '#dc3545', border: '#bd2130', icon: '✕' }
+    success: { bg: "#28a745", border: "#1e7e34", icon: "✓" },
+    info: { bg: "#17a2b8", border: "#117a8b", icon: "ℹ" },
+    warning: { bg: "#ffc107", border: "#d39e00", icon: "⚠" },
+    error: { bg: "#dc3545", border: "#bd2130", icon: "✕" },
   };
-  
+
   const color = colors[notification.type] || colors.info;
-  
+
   notificationElement.style.cssText = `
     position: fixed;
     bottom: 20px;
@@ -219,7 +219,7 @@ function processNotificationQueue() {
     border-left: 4px solid ${color.border};
     margin-bottom: ${notificationQueue.length * 10}px;
   `;
-  
+
   notificationElement.innerHTML = `
     <div style="
       width: 16px;
@@ -235,20 +235,20 @@ function processNotificationQueue() {
     ">${color.icon}</div>
     <span>${notification.message}</span>
   `;
-  
+
   document.body.appendChild(notificationElement);
-  
+
   // Animate in
   setTimeout(() => {
-    notificationElement.style.opacity = '1';
-    notificationElement.style.transform = 'translateY(0)';
+    notificationElement.style.opacity = "1";
+    notificationElement.style.transform = "translateY(0)";
   }, 10);
-  
+
   // Auto hide
   setTimeout(() => {
-    notificationElement.style.opacity = '0';
-    notificationElement.style.transform = 'translateY(100%)';
-    
+    notificationElement.style.opacity = "0";
+    notificationElement.style.transform = "translateY(100%)";
+
     setTimeout(() => {
       if (notificationElement.parentNode) {
         notificationElement.parentNode.removeChild(notificationElement);
@@ -263,17 +263,17 @@ function processNotificationQueue() {
  * Convenience functions for different notification types
  */
 export function showSuccessNotification(message, duration = 3000) {
-  showNotification(message, 'success', duration);
+  showNotification(message, "success", duration);
 }
 
 export function showInfoNotification(message, duration = 3000) {
-  showNotification(message, 'info', duration);
+  showNotification(message, "info", duration);
 }
 
 export function showWarningNotification(message, duration = 3000) {
-  showNotification(message, 'warning', duration);
+  showNotification(message, "warning", duration);
 }
 
 export function showErrorNotification(message, duration = 3000) {
-  showNotification(message, 'error', duration);
+  showNotification(message, "error", duration);
 }

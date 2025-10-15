@@ -41,313 +41,6 @@ let currentStatusFilter = "Pending"; // Default filter to show only pending book
 let currentDateFilter = "all"; // Default date filter
 let refreshInterval; // Variable to store the refresh interval
 
-// =========================================================================
-// FUNCTION DECLARATIONS (MOVED OUTSIDE DOMContentLoaded FOR SCOPE FIX)
-// =========================================================================
-
-/**
- * Renders the bookings table based on the current filter and fetched data.
- * Fetches all bookings, then filters them locally before rendering.
- * NOTE: This function is initially defined inside DOMContentLoaded but must be defined
- * or assigned in a broader scope to be called by startRealTimeRefresh.
- * We'll define a placeholder here and assign the actual logic later.
- */
-let applyFilters = () => {
-  // This is a placeholder that will be replaced in DOMContentLoaded
-  console.error("applyFilters logic not initialized yet.");
-};
-
-/**
- * Starts the real-time refresh functionality
- * This is now globally available and correctly calls the assigned applyFilters function.
- */
-function startRealTimeRefresh() {
-  // Clear any existing interval
-  if (refreshInterval) {
-    clearInterval(refreshInterval);
-  }
-
-  // Set up new interval to refresh every 30 seconds
-  refreshInterval = setInterval(async () => {
-    try {
-      console.log("Auto-refreshing bookings data...");
-      // FIX 2: applyFilters is now accessible globally via the assigned variable
-      await applyFilters();
-    } catch (error) {
-      // FIX 2: Log the error, but the ReferenceError should be gone now.
-      console.error("Error during auto-refresh:", error);
-    }
-  }, 30000); // 30 seconds
-
-  console.log("Real-time refresh started (every 30 seconds)");
-}
-
-/**
- * Stops the real-time refresh functionality
- */
-function stopRealTimeRefresh() {
-  if (refreshInterval) {
-    clearInterval(refreshInterval);
-    refreshInterval = null;
-    console.log("Real-time refresh stopped");
-  }
-}
-
-/**
- * Restarts the real-time refresh functionality
- */
-function restartRealTimeRefresh() {
-  stopRealTimeRefresh();
-  startRealTimeRefresh();
-}
-
-/**
- * Fetches and displays comprehensive details for a given booking ID using a modal.
- * It first checks a local cache, then falls back to Firestore if not found.
- * Displays information using the showGenericModal function from modal_handler.js.
- * @param {string} bookingId - The ID of the booking to view.
- */
-async function viewBookingDetails(bookingId) {
-  let bookingData = allBookingsData[bookingId]; // Try to get from cache first
-
-  // If not in cache, fetch from Firestore
-  if (!bookingData) {
-    console.log(
-      `Booking ID ${bookingId} not in cache, fetching from Firestore.`
-    );
-    const bookingRef = doc(db, "bookings", bookingId);
-    try {
-      const bookingSnap = await getDoc(bookingRef);
-      if (!bookingSnap.exists()) {
-        alert("Booking data not found in Firestore for ID: " + bookingId);
-        console.error(
-          "Booking data not found in Firestore for ID: " + bookingId
-        );
-        return;
-      }
-      allBookingsData[bookingId] = bookingSnap.data(); // Cache it for future use
-      bookingData = allBookingsData[bookingId];
-      console.log("Booking data fetched from Firestore:", bookingData);
-    } catch (err) {
-      console.error("Error fetching booking from Firestore:", err);
-      alert("Error fetching booking details: " + err.message);
-      return;
-    }
-  } else {
-    console.log("Booking data found in cache:", bookingData);
-  }
-
-  // FIX 1: Define customerName here using data from the fetched bookingData object
-  const customerName = bookingData.ownerInformation
-    ? `${bookingData.ownerInformation.firstName || ""} ${bookingData.ownerInformation.lastName || ""}`.trim()
-    : "N/A";
-
-  // --- Construct the HTML for the modal content ---
-  let detailsHtml = `
-      <div class="modal-section">
-        <h3>General Information</h3>
-        <div class="info-item"><strong>Customer:</strong> <p>${customerName}</p></div>
-        <div class="info-item"><strong>Service Type:</strong> <p>${bookingData.serviceType || "N/A"}</p></div>
-        <div class="info-item"><strong>Status:</strong> <p>${bookingData.status || "N/A"}</p></div>
-        <div class="info-item"><strong>Preferred Date:</strong> <p>${bookingData.date || "N/A"}</p></div>
-        <div class="info-item"><strong>Preferred Time:</strong> <p>${bookingData.time || "N/A"}</p></div>
-        <div class="info-item"><strong>Submitted On:</strong> <p>${bookingData.timestamp ? new Date(bookingData.timestamp.toDate()).toLocaleString() : "N/A"}</p></div>
-      </div>
-
-      <div class="modal-section">
-        <h3>Owner Information</h3>
-        <div class="info-item"><strong>Full Name:</strong> <p>${bookingData.ownerInformation ? `${bookingData.ownerInformation.firstName || ""} ${bookingData.ownerInformation.lastName || ""}`.trim() : "N/A"}</p></div>
-        <div class="info-item"><strong>Email:</strong> <p>${bookingData.ownerInformation?.email || "N/A"}</p></div>
-        <div class="info-item"><strong>Contact No:</strong> <p>${bookingData.ownerInformation?.contactNo || "N/A"}</p></div>
-        <div class="info-item"><strong>Address:</strong> <p>${bookingData.ownerInformation?.address || "N/A"}</p></div>
-      </div>
-
-      <div class="modal-section">
-        <h3>Pet Information</h3>
-        <div class="info-item"><strong>Name:</strong> <p>${bookingData.petInformation?.petName || "N/A"}</p></div>
-        <div class="info-item"><strong>Type:</strong> <p>${bookingData.petInformation?.petType || "N/A"}</p></div>
-        <div class="info-item"><strong>Breed:</strong> <p>${bookingData.petInformation?.petBreed || "N/A"}</p></div>
-    `;
-
-  // Service-specific details
-  if (bookingData.serviceType === "Boarding") {
-    detailsHtml += `
-        <div class="info-item"><strong>Age:</strong> <p>${bookingData.petInformation?.petAge || "N/A"}</p></div>
-        <div class="info-item"><strong>Weight:</strong> <p>${bookingData.petInformation?.petWeight || "N/A"} kg</p></div>
-      </div>
-
-      <div class="modal-section">
-        <h3>Boarding Details</h3>
-        <div class="info-item"><strong>Check-in:</strong> <p>${bookingData.boardingDetails?.checkInDate || "N/A"}</p></div>
-        <div class="info-item"><strong>Check-out:</strong> <p>${bookingData.boardingDetails?.checkOutDate || "N/A"}</p></div>
-        <div class="info-item"><strong>Room Type:</strong> <p>${bookingData.boardingDetails?.selectedRoomType || "N/A"}</p></div>
-        <div class="info-item"><strong>Waiver Agreed:</strong> <p>${bookingData.boardingDetails?.boardingWaiverAgreed ? "Yes" : "No"}</p></div>
-      </div>
-
-      <div class="modal-section">
-        <h3>Feeding Details</h3>
-        <div class="info-item"><strong>Food Brand:</strong> <p>${bookingData.feedingDetails?.foodBrand || "N/A"}</p></div>
-        <div class="info-item"><strong>Meals/Day:</strong> <p>${bookingData.feedingDetails?.numberOfMeals || "N/A"}</p></div>
-      `;
-    if (bookingData.feedingDetails?.morningFeeding)
-      detailsHtml += `  <div class="info-item"><strong>Morning Feeding:</strong> <p>${bookingData.feedingDetails?.morningTime || "N/A"}</p></div>`;
-    if (bookingData.feedingDetails?.afternoonFeeding)
-      detailsHtml += `  <div class="info-item"><strong>Afternoon Feeding:</strong> <p>${bookingData.feedingDetails?.afternoonTime || "N/A"}</p></div>`;
-    if (bookingData.feedingDetails?.eveningFeeding)
-      detailsHtml += `  <div class="info-item"><strong>Evening Feeding:</strong> <p>${bookingData.feedingDetails?.eveningTime || "N/A"}</p></div>`;
-    detailsHtml += `</div>`; // Close feeding details section
-
-    // --- Vaccination Record Image ---
-    console.log(
-      "Vaccination Image URL:",
-      bookingData.vaccinationRecord?.imageUrl
-    ); // Log the URL
-    detailsHtml += `
-      <div class="modal-section">
-        <h3>Vaccination Record</h3>
-        <div class="image-container">
-          ${bookingData.vaccinationRecord?.imageUrl ? `<img src="${bookingData.vaccinationRecord.imageUrl}" alt="Vaccination Record" class="booking-image" onclick="window.open('${bookingData.vaccinationRecord.imageUrl}', '_blank')">` : `<p>No image provided</p>`}
-        </div>
-      </div>
-      `;
-
-    // --- Payment Details and Receipt Image ---
-    console.log(
-      "Payment Receipt Image URL:",
-      bookingData.paymentDetails?.receiptImageUrl
-    ); // Log the URL
-    detailsHtml += `
-      <div class="modal-section">
-        <h3>Payment Details</h3>
-        <div class="info-item"><strong>Method:</strong> <p>${bookingData.paymentDetails?.method || "N/A"}</p></div>
-        <div class="info-item"><strong>Account:</strong> <p>${bookingData.paymentDetails?.accountNumber || "N/A"} (${bookingData.paymentDetails?.accountName || "N/A"})</p></div>
-        <div class="image-container">
-          ${bookingData.paymentDetails?.receiptImageUrl ? `<img src="${bookingData.paymentDetails.receiptImageUrl}" alt="Payment Receipt" class="booking-image" onclick="window.open('${bookingData.paymentDetails.receiptImageUrl}', '_blank')">` : `<p>No image provided</p>`}
-        </div>
-      </div>
-      `;
-  } else if (bookingData.serviceType === "Grooming") {
-    detailsHtml += `
-        <div class="info-item"><strong>Gender:</strong> <p>${bookingData.petInformation?.petGender || "N/A"}</p></div>
-        <div class="info-item"><strong>Date of Birth:</strong> <p>${bookingData.petInformation?.dateOfBirth || "N/A"}</p></div>
-        <div class="info-item"><strong>Colors/Markings:</strong> <p>${bookingData.petInformation?.petColorsMarkings || "N/A"}</p></div>
-      </div>
-
-      <div class="modal-section">
-        <h3>Grooming Details</h3>
-        <div class="info-item"><strong>Check-in Date:</strong> <p>${bookingData.groomingDetails?.groomingCheckInDate || "N/A"}</p></div>
-        <div class="info-item"><strong>Waiver Agreed:</strong> <p>${bookingData.groomingDetails?.groomingWaiverAgreed ? "Yes" : "No"}</p></div>
-      </div>
-      `;
-  }
-
-  // Admin notes (handled as an array for consistency)
-  let adminNotesArray = [];
-  if (bookingData.adminNotes) {
-    if (Array.isArray(bookingData.adminNotes)) {
-      adminNotesArray = bookingData.adminNotes;
-    } else if (typeof bookingData.adminNotes === "string") {
-      adminNotesArray = [bookingData.adminNotes]; // Convert string to array
-    }
-  }
-  detailsHtml += `
-      <div class="modal-section">
-        <h3>Admin Notes</h3>
-        <p>${adminNotesArray.join("<br>") || "N/A"}</p>
-      </div>
-    `;
-
-  // Get the modal element and the specific content target within it
-  const viewDetailsModal = document.getElementById("viewDetailsModal");
-  const bookingDetailsContent = document.getElementById(
-    "bookingDetailsContent"
-  ); // This is the div that will hold the generated HTML
-
-  // Use showGenericModal from modal_handler.js
-  showGenericModal(
-    viewDetailsModal,
-    `Booking Details: ${bookingId}`,
-    detailsHtml,
-    bookingDetailsContent
-  );
-}
-
-/**
- * Calculates the total amount, down payment, and balance for a booking.
- * Uses the same logic as the sales reports calculation.
- * @param {object} bookingData - The booking data from Firestore.
- * @returns {object} An object containing totalAmount, downPayment, and balance.
- */
-function calculateBookingAmounts(bookingData) {
-  let totalAmount = 0;
-  let petWeight = parseFloat(bookingData.petInformation?.petWeight);
-  let petSize = getPetSizeCategory(petWeight);
-
-  // Pricing based on pet size categories (same as sales reports)
-  const sizePrices = {
-    Small: 500,
-    Medium: 600,
-    Large: 700,
-    XL: 800,
-    XXL: 900,
-    "N/A": 0,
-  };
-
-  if (bookingData.serviceType === "Boarding") {
-    // Base price per day depends on pet size
-    let dailyPrice = sizePrices[petSize] || 0;
-
-    // Calculate total based on number of days
-    const checkInDateStr =
-      bookingData.boardingDetails?.checkInDate || bookingData.date;
-    const checkOutDateStr = bookingData.boardingDetails?.checkOutDate;
-
-    if (checkInDateStr && checkOutDateStr) {
-      const checkInDate = new Date(checkInDateStr);
-      const checkOutDate = new Date(checkOutDateStr);
-      const diffTime = Math.abs(checkOutDate.getTime() - checkInDate.getTime());
-      const daysDiff = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      totalAmount = dailyPrice * Math.max(1, daysDiff); // Ensure at least 1 day
-    } else {
-      totalAmount = 0; // If dates are missing, total is 0
-    }
-  } else if (bookingData.serviceType === "Grooming") {
-    // Grooming price also depends on pet size
-    totalAmount = sizePrices[petSize] || 0;
-  }
-
-  // Get downPayment from bookingData.paymentDetails.downPaymentAmount if available, otherwise default to 0
-  let actualDownPayment = parseFloat(
-    bookingData.paymentDetails?.downPaymentAmount
-  );
-  if (isNaN(actualDownPayment)) {
-    actualDownPayment = 0; // Default to 0 if not a valid number or not provided
-  }
-
-  // Balance is always totalAmount minus the actualDownPayment
-  const balance = totalAmount - actualDownPayment;
-
-  return { totalAmount, downPayment: actualDownPayment, balance, petSize };
-}
-
-/**
- * Determines the pet size category based on its weight in kilograms.
- * @param {number} weightKg - The pet's weight in kilograms.
- * @returns {string} The pet size category (Small, Medium, Large, XL, XXL).
- */
-function getPetSizeCategory(weightKg) {
-  if (typeof weightKg !== "number" || isNaN(weightKg)) {
-    return "N/A";
-  }
-  if (weightKg < 10) return "Small";
-  if (weightKg >= 11 && weightKg <= 26) return "Medium";
-  if (weightKg >= 27 && weightKg <= 34) return "Large";
-  if (weightKg >= 34 && weightKg <= 38) return "XL";
-  if (weightKg > 38) return "XXL";
-  return "N/A"; // Fallback for weights outside defined ranges
-}
-
-// --- Functions that rely on local scope, kept inside DOMContentLoaded logic ---
 document.addEventListener("DOMContentLoaded", async () => {
   const bookingsTableBody = document.getElementById("bookingsTableBody");
   const statusFilterSelect = document.getElementById("statusFilter");
@@ -469,9 +162,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   /**
    * Apply filters to bookings data
-   * FIX 2: Assign the actual applyFilters logic to the global variable
    */
-  applyFilters = () => {
+  const applyFilters = () => {
     renderBookingsTable();
   };
 
@@ -978,6 +670,172 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderBookingsTable();
 
   /**
+   * Fetches and displays comprehensive details for a given booking ID using a modal.
+   * It first checks a local cache, then falls back to Firestore if not found.
+   * Displays information using the showGenericModal function from modal_handler.js.
+   * @param {string} bookingId - The ID of the booking to view.
+   */
+  async function viewBookingDetails(bookingId) {
+    let bookingData = allBookingsData[bookingId]; // Try to get from cache first
+
+    // If not in cache, fetch from Firestore
+    if (!bookingData) {
+      console.log(
+        `Booking ID ${bookingId} not in cache, fetching from Firestore.`
+      );
+      const bookingRef = doc(db, "bookings", bookingId);
+      try {
+        const bookingSnap = await getDoc(bookingRef);
+        if (!bookingSnap.exists()) {
+          alert("Booking data not found in Firestore for ID: " + bookingId);
+          console.error(
+            "Booking data not found in Firestore for ID: " + bookingId
+          );
+          return;
+        }
+        allBookingsData[bookingId] = bookingSnap.data(); // Cache it for future use
+        bookingData = allBookingsData[bookingId];
+        console.log("Booking data fetched from Firestore:", bookingData);
+      } catch (err) {
+        console.error("Error fetching booking from Firestore:", err);
+        alert("Error fetching booking details: " + err.message);
+        return;
+      }
+    } else {
+      console.log("Booking data found in cache:", bookingData);
+    }
+
+    // --- Construct the HTML for the modal content ---
+    let detailsHtml = `
+      <div class="modal-section">
+        <h3>General Information</h3>
+        <div class="info-item"><strong>Customer:</strong> <p>${customerName}</p></div>
+        <div class="info-item"><strong>Service Type:</strong> <p>${bookingData.serviceType || "N/A"}</p></div>
+        <div class="info-item"><strong>Status:</strong> <p>${bookingData.status || "N/A"}</p></div>
+        <div class="info-item"><strong>Preferred Date:</strong> <p>${bookingData.date || "N/A"}</p></div>
+        <div class="info-item"><strong>Preferred Time:</strong> <p>${bookingData.time || "N/A"}</p></div>
+        <div class="info-item"><strong>Submitted On:</strong> <p>${bookingData.timestamp ? new Date(bookingData.timestamp.toDate()).toLocaleString() : "N/A"}</p></div>
+      </div>
+
+      <div class="modal-section">
+        <h3>Owner Information</h3>
+        <div class="info-item"><strong>Full Name:</strong> <p>${bookingData.ownerInformation ? `${bookingData.ownerInformation.firstName || ""} ${bookingData.ownerInformation.lastName || ""}`.trim() : "N/A"}</p></div>
+        <div class="info-item"><strong>Email:</strong> <p>${bookingData.ownerInformation?.email || "N/A"}</p></div>
+        <div class="info-item"><strong>Contact No:</strong> <p>${bookingData.ownerInformation?.contactNo || "N/A"}</p></div>
+        <div class="info-item"><strong>Address:</strong> <p>${bookingData.ownerInformation?.address || "N/A"}</p></div>
+      </div>
+
+      <div class="modal-section">
+        <h3>Pet Information</h3>
+        <div class="info-item"><strong>Name:</strong> <p>${bookingData.petInformation?.petName || "N/A"}</p></div>
+        <div class="info-item"><strong>Type:</strong> <p>${bookingData.petInformation?.petType || "N/A"}</p></div>
+        <div class="info-item"><strong>Breed:</strong> <p>${bookingData.petInformation?.petBreed || "N/A"}</p></div>
+    `;
+
+    // Service-specific details
+    if (bookingData.serviceType === "Boarding") {
+      detailsHtml += `
+        <div class="info-item"><strong>Age:</strong> <p>${bookingData.petInformation?.petAge || "N/A"}</p></div>
+        <div class="info-item"><strong>Weight:</strong> <p>${bookingData.petInformation?.petWeight || "N/A"} kg</p></div>
+      </div>
+
+      <div class="modal-section">
+        <h3>Boarding Details</h3>
+        <div class="info-item"><strong>Check-in:</strong> <p>${bookingData.boardingDetails?.checkInDate || "N/A"}</p></div>
+        <div class="info-item"><strong>Check-out:</strong> <p>${bookingData.boardingDetails?.checkOutDate || "N/A"}</p></div>
+        <div class="info-item"><strong>Room Type:</strong> <p>${bookingData.boardingDetails?.selectedRoomType || "N/A"}</p></div>
+        <div class="info-item"><strong>Waiver Agreed:</strong> <p>${bookingData.boardingDetails?.boardingWaiverAgreed ? "Yes" : "No"}</p></div>
+      </div>
+
+      <div class="modal-section">
+        <h3>Feeding Details</h3>
+        <div class="info-item"><strong>Food Brand:</strong> <p>${bookingData.feedingDetails?.foodBrand || "N/A"}</p></div>
+        <div class="info-item"><strong>Meals/Day:</strong> <p>${bookingData.feedingDetails?.numberOfMeals || "N/A"}</p></div>
+      `;
+      if (bookingData.feedingDetails?.morningFeeding)
+        detailsHtml += `  <div class="info-item"><strong>Morning Feeding:</strong> <p>${bookingData.feedingDetails?.morningTime || "N/A"}</p></div>`;
+      if (bookingData.feedingDetails?.afternoonFeeding)
+        detailsHtml += `  <div class="info-item"><strong>Afternoon Feeding:</strong> <p>${bookingData.feedingDetails?.afternoonTime || "N/A"}</p></div>`;
+      if (bookingData.feedingDetails?.eveningFeeding)
+        detailsHtml += `  <div class="info-item"><strong>Evening Feeding:</strong> <p>${bookingData.feedingDetails?.eveningTime || "N/A"}</p></div>`;
+      detailsHtml += `</div>`; // Close feeding details section
+
+      // --- Vaccination Record Image ---
+      console.log(
+        "Vaccination Image URL:",
+        bookingData.vaccinationRecord?.imageUrl
+      ); // Log the URL
+      detailsHtml += `
+      <div class="modal-section">
+        <h3>Vaccination Record</h3>
+        <div class="image-container">
+          ${bookingData.vaccinationRecord?.imageUrl ? `<img src="${bookingData.vaccinationRecord.imageUrl}" alt="Vaccination Record" class="booking-image" onclick="window.open('${bookingData.vaccinationRecord.imageUrl}', '_blank')">` : `<p>No image provided</p>`}
+        </div>
+      </div>
+      `;
+
+      // --- Payment Details and Receipt Image ---
+      console.log(
+        "Payment Receipt Image URL:",
+        bookingData.paymentDetails?.receiptImageUrl
+      ); // Log the URL
+      detailsHtml += `
+      <div class="modal-section">
+        <h3>Payment Details</h3>
+        <div class="info-item"><strong>Method:</strong> <p>${bookingData.paymentDetails?.method || "N/A"}</p></div>
+        <div class="info-item"><strong>Account:</strong> <p>${bookingData.paymentDetails?.accountNumber || "N/A"} (${bookingData.paymentDetails?.accountName || "N/A"})</p></div>
+        <div class="image-container">
+          ${bookingData.paymentDetails?.receiptImageUrl ? `<img src="${bookingData.paymentDetails.receiptImageUrl}" alt="Payment Receipt" class="booking-image" onclick="window.open('${bookingData.paymentDetails.receiptImageUrl}', '_blank')">` : `<p>No image provided</p>`}
+        </div>
+      </div>
+      `;
+    } else if (bookingData.serviceType === "Grooming") {
+      detailsHtml += `
+        <div class="info-item"><strong>Gender:</strong> <p>${bookingData.petInformation?.petGender || "N/A"}</p></div>
+        <div class="info-item"><strong>Date of Birth:</strong> <p>${bookingData.petInformation?.dateOfBirth || "N/A"}</p></div>
+        <div class="info-item"><strong>Colors/Markings:</strong> <p>${bookingData.petInformation?.petColorsMarkings || "N/A"}</p></div>
+      </div>
+
+      <div class="modal-section">
+        <h3>Grooming Details</h3>
+        <div class="info-item"><strong>Check-in Date:</strong> <p>${bookingData.groomingDetails?.groomingCheckInDate || "N/A"}</p></div>
+        <div class="info-item"><strong>Waiver Agreed:</strong> <p>${bookingData.groomingDetails?.groomingWaiverAgreed ? "Yes" : "No"}</p></div>
+      </div>
+      `;
+    }
+
+    // Admin notes (handled as an array for consistency)
+    let adminNotesArray = [];
+    if (bookingData.adminNotes) {
+      if (Array.isArray(bookingData.adminNotes)) {
+        adminNotesArray = bookingData.adminNotes;
+      } else if (typeof bookingData.adminNotes === "string") {
+        adminNotesArray = [bookingData.adminNotes]; // Convert string to array
+      }
+    }
+    detailsHtml += `
+      <div class="modal-section">
+        <h3>Admin Notes</h3>
+        <p>${adminNotesArray.join("<br>") || "N/A"}</p>
+      </div>
+    `;
+
+    // Get the modal element and the specific content target within it
+    const viewDetailsModal = document.getElementById("viewDetailsModal");
+    const bookingDetailsContent = document.getElementById(
+      "bookingDetailsContent"
+    ); // This is the div that will hold the generated HTML
+
+    // Use showGenericModal from modal_handler.js
+    showGenericModal(
+      viewDetailsModal,
+      `Booking Details: ${bookingId}`,
+      detailsHtml,
+      bookingDetailsContent
+    );
+  }
+
+  /**
    * Creates a sales report entry when a booking is accepted.
    * @param {object} bookingData - The booking data from Firestore.
    * @param {string} bookingId - The ID of the booking.
@@ -1350,6 +1208,83 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.log("showGenericModal called successfully");
   }
 
+  /**
+   * Calculates the total amount, down payment, and balance for a booking.
+   * Uses the same logic as the sales reports calculation.
+   * @param {object} bookingData - The booking data from Firestore.
+   * @returns {object} An object containing totalAmount, downPayment, and balance.
+   */
+  function calculateBookingAmounts(bookingData) {
+    let totalAmount = 0;
+    let petWeight = parseFloat(bookingData.petInformation?.petWeight);
+    let petSize = getPetSizeCategory(petWeight);
+
+    // Pricing based on pet size categories (same as sales reports)
+    const sizePrices = {
+      Small: 500,
+      Medium: 600,
+      Large: 700,
+      XL: 800,
+      XXL: 900,
+      "N/A": 0,
+    };
+
+    if (bookingData.serviceType === "Boarding") {
+      // Base price per day depends on pet size
+      let dailyPrice = sizePrices[petSize] || 0;
+
+      // Calculate total based on number of days
+      const checkInDateStr =
+        bookingData.boardingDetails?.checkInDate || bookingData.date;
+      const checkOutDateStr = bookingData.boardingDetails?.checkOutDate;
+
+      if (checkInDateStr && checkOutDateStr) {
+        const checkInDate = new Date(checkInDateStr);
+        const checkOutDate = new Date(checkOutDateStr);
+        const diffTime = Math.abs(
+          checkOutDate.getTime() - checkInDate.getTime()
+        );
+        const daysDiff = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        totalAmount = dailyPrice * Math.max(1, daysDiff); // Ensure at least 1 day
+      } else {
+        totalAmount = 0; // If dates are missing, total is 0
+      }
+    } else if (bookingData.serviceType === "Grooming") {
+      // Grooming price also depends on pet size
+      totalAmount = sizePrices[petSize] || 0;
+    }
+
+    // Get downPayment from bookingData.paymentDetails.downPaymentAmount if available, otherwise default to 0
+    let actualDownPayment = parseFloat(
+      bookingData.paymentDetails?.downPaymentAmount
+    );
+    if (isNaN(actualDownPayment)) {
+      actualDownPayment = 0; // Default to 0 if not a valid number or not provided
+    }
+
+    // Balance is always totalAmount minus the actualDownPayment
+    const balance = totalAmount - actualDownPayment;
+
+    return { totalAmount, downPayment: actualDownPayment, balance, petSize };
+  }
+
+  /**
+   * Determines the pet size category based on its weight in kilograms.
+   * @param {number} weightKg - The pet's weight in kilograms.
+   * @returns {string} The pet size category (Small, Medium, Large, XL, XXL).
+   */
+  function getPetSizeCategory(weightKg) {
+    if (typeof weightKg !== "number" || isNaN(weightKg)) {
+      return "N/A";
+    }
+    if (weightKg < 10) return "Small";
+    if (weightKg >= 11 && weightKg <= 26) return "Medium";
+    if (weightKg >= 27 && weightKg <= 34) return "Large";
+    if (weightKg >= 34 && weightKg <= 38) return "XL";
+    if (weightKg > 38) return "XXL";
+    return "N/A"; // Fallback for weights outside defined ranges
+  }
+
   // Start real-time refresh (every 30 seconds)
   startRealTimeRefresh();
 
@@ -1359,6 +1294,44 @@ document.addEventListener("DOMContentLoaded", async () => {
   initializeAcceptanceMonitoring();
 });
 
-// =========================================================================
-// END FUNCTION DECLARATIONS (MOVED OUTSIDE DOMContentLoaded FOR SCOPE FIX)
-// =========================================================================
+/**
+ * Starts the real-time refresh functionality
+ */
+function startRealTimeRefresh() {
+  // Clear any existing interval
+  if (refreshInterval) {
+    clearInterval(refreshInterval);
+  }
+
+  // Set up new interval to refresh every 30 seconds
+  refreshInterval = setInterval(async () => {
+    try {
+      console.log("Auto-refreshing bookings data...");
+
+      await applyFilters();
+    } catch (error) {
+      console.error("Error during auto-refresh:", error);
+    }
+  }, 30000); // 30 seconds
+
+  console.log("Real-time refresh started (every 30 seconds)");
+}
+
+/**
+ * Stops the real-time refresh functionality
+ */
+function stopRealTimeRefresh() {
+  if (refreshInterval) {
+    clearInterval(refreshInterval);
+    refreshInterval = null;
+    console.log("Real-time refresh stopped");
+  }
+}
+
+/**
+ * Restarts the real-time refresh functionality
+ */
+function restartRealTimeRefresh() {
+  stopRealTimeRefresh();
+  startRealTimeRefresh();
+}

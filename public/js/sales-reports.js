@@ -29,6 +29,21 @@ const endDate = document.getElementById("endDate");
 const printSelectedRowsBtn = document.getElementById("printSelectedRowsBtn");
 const selectAllRowsCheckbox = document.getElementById("selectAllRows");
 const dataTableThead = document.querySelector(".data-table thead tr");
+const detailsModal = document.getElementById("detailsModal"); // Get modal reference
+const overlay = document.getElementById("overlay"); // Get overlay reference
+
+/**
+ * Utility function to hide the modal and overlay.
+ * This should ideally be exported from modal_handler.js, but we define it here as a fallback
+ * and for direct use in this module's functions.
+ * @param {HTMLElement} modal - The modal element to hide.
+ */
+function hideSalesModal(modal) {
+  if (modal) {
+    modal.style.display = "none";
+    overlay.style.display = "none";
+  }
+}
 
 /**
  * Determines the pet size category based on its weight in kilograms, using the updated chart.
@@ -502,24 +517,22 @@ window.showReceiptModal = function (saleId) {
 
   // Use the existing generic modal handler
   showGenericModal(
-    document.getElementById("detailsModal"),
+    detailsModal, // Use the pre-fetched modal element
     `Receipt - #${sale.transactionID}`,
     receiptHtml
   );
 
   // Custom button for printing the modal content
-  const modalFooter = document
-    .getElementById("detailsModal")
-    .querySelector(".modal-footer");
+  const modalFooter = detailsModal.querySelector(".modal-footer");
   // Clear the default Close button added by showGenericModal
   modalFooter.innerHTML = "";
 
   const closeButton = document.createElement("button");
   closeButton.className = "btn btn-secondary action-btn";
   closeButton.textContent = "Close";
-  closeButton.addEventListener("click", () =>
-    window.hideGenericModal(document.getElementById("detailsModal"))
-  );
+
+  // *** FIX: Use the local hideSalesModal function to ensure the receipt modal closes correctly ***
+  closeButton.addEventListener("click", () => hideSalesModal(detailsModal));
 
   const printButton = document.createElement("button");
   printButton.className = "btn btn-primary action-btn";
@@ -531,6 +544,18 @@ window.showReceiptModal = function (saleId) {
 
   modalFooter.appendChild(closeButton);
   modalFooter.appendChild(printButton);
+
+  // *** FIX: Ensure the header close button also uses the correct closing logic when showing the receipt modal ***
+  const modalCloseBtnHeader = document.getElementById("modalCloseBtn");
+  // Remove existing listeners before adding a new one for safety
+  const newModalCloseBtnHeader = modalCloseBtnHeader.cloneNode(true);
+  modalCloseBtnHeader.parentNode.replaceChild(
+    newModalCloseBtnHeader,
+    modalCloseBtnHeader
+  );
+  newModalCloseBtnHeader.addEventListener("click", () =>
+    hideSalesModal(detailsModal)
+  );
 };
 
 // =========================================================================
@@ -950,6 +975,14 @@ endDate.addEventListener("change", applyFilters);
 
 document.addEventListener("DOMContentLoaded", function () {
   loadSalesData();
+
+  // FIX: Attach closing logic to the header 'X' button for the sales details modal (which holds the receipt)
+  const modalCloseBtnHeader = document.getElementById("modalCloseBtn");
+  if (modalCloseBtnHeader) {
+    modalCloseBtnHeader.addEventListener("click", () => {
+      hideSalesModal(detailsModal);
+    });
+  }
 });
 
 window.refreshSalesReports = loadSalesData;
