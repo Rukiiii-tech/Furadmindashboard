@@ -8,6 +8,26 @@
     <link rel="stylesheet" href="tables.css" />
     <link rel="stylesheet" href="pets.css" />
     <link rel="stylesheet" href="modal.css" />
+    <style>
+      .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 10px; /* Space between elements */
+        margin-bottom: 20px;
+      }
+      .filter-group label {
+        white-space: nowrap; /* Prevent "Filter by Age Stage" from wrapping */
+      }
+      /* New style for the dropdown */
+      .filter-group select {
+        padding: 8px 12px; /* Adjusted padding for dropdown */
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background: white; /* Ensure dropdown background is white */
+        min-width: 150px; /* Give the dropdown a reasonable width */
+        font-size: 13.333px;
+      }
+    </style>
   </head>
   <body>
     <div class="dashboard-container">
@@ -21,8 +41,7 @@
           <a href="pets.html" class="active">Pets</a>
           <a href="bookings.html">Pending Bookings</a>
           <a href="bookings-approved.html">Bookings</a>
-          
-          <!-- Reports Sub-menu -->
+
           <div class="nav-item">
             <a href="#" class="nav-link" id="reportsDropdown">Reports ▼</a>
             <div class="submenu" id="reportsSubmenu">
@@ -39,6 +58,19 @@
       <div class="main-content">
         <h1>Pets</h1>
 
+        <div class="filter-group">
+          <label for="maxAgeFilter">Filter by Age Stage:</label>
+          <select id="maxAgeFilter">
+            <option value="">All Ages</option>
+            <option value="0-6M">0 to 6 Months (Early Puppyhood)</option>
+            <option value="6-12M">
+              6 to 12 Months (Late Puppyhood/Adolescence)
+            </option>
+            <option value="1-2Y">1 to 2 Years (Young Adult)</option>
+            <option value="2-3Y">2 to 3 Years (Full Adulthood)</option>
+            <option value="3+Y">3+ Years (Mature Adult)</option>
+          </select>
+        </div>
         <div class="table-container">
           <table class="pets-table">
             <thead>
@@ -49,13 +81,14 @@
                 <th>Pet Gender</th>
                 <th>Pet Weight</th>
                 <th>Birthdate</th>
+                <th>Age (Yrs)</th>
                 <th>Cage Type</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody id="petsTableBody">
               <tr>
-                <td colspan="8" style="text-align: center; padding: 20px">
+                <td colspan="9" style="text-align: center; padding: 20px">
                   Loading pets...
                 </td>
               </tr>
@@ -89,7 +122,6 @@
       import { initializeLogout } from "./js/logout-handler.js";
       initializeLogout();
 
-      // Initialize modal close listeners for petDetailsModal
       import { initializeModalCloseListeners } from "./js/modal_handler.js";
       const petDetailsModal = document.getElementById("petDetailsModal");
       initializeModalCloseListeners(
@@ -97,38 +129,44 @@
         "closePetModal",
         "closePetModalFooter"
       );
+
+      import { loadPetsData } from "./js/pets.js";
+
+      document
+        .getElementById("maxAgeFilter")
+        .addEventListener("change", (e) => {
+          const selectedAgeRange = e.target.value;
+          loadPetsData(selectedAgeRange);
+        });
     </script>
-    
-    <!-- Sub-menu Toggle Script -->
+
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const reportsDropdown = document.getElementById('reportsDropdown');
-        const reportsSubmenu = document.getElementById('reportsSubmenu');
-        
-        // Only handle reports dropdown clicks
-        reportsDropdown.addEventListener('click', function(e) {
+      document.addEventListener("DOMContentLoaded", function () {
+        const reportsDropdown = document.getElementById("reportsDropdown");
+        const reportsSubmenu = document.getElementById("reportsSubmenu");
+
+        reportsDropdown.addEventListener("click", function (e) {
           e.preventDefault();
-          e.stopPropagation(); // Prevent event bubbling
-          reportsSubmenu.classList.toggle('active');
-          
-          // Change arrow direction
-          if (reportsSubmenu.classList.contains('active')) {
-            reportsDropdown.innerHTML = 'Reports ▲';
+          e.stopPropagation();
+          reportsSubmenu.classList.toggle("active");
+
+          if (reportsSubmenu.classList.contains("active")) {
+            reportsDropdown.innerHTML = "Reports ▲";
           } else {
-            reportsDropdown.innerHTML = 'Reports ▼';
+            reportsDropdown.innerHTML = "Reports ▼";
           }
         });
-        
-        // Close submenu when clicking outside the reports section specifically
-        document.addEventListener('click', function(e) {
-          // Only close if clicking outside the reports dropdown area
-          if (!e.target.closest('#reportsDropdown') && !e.target.closest('#reportsSubmenu')) {
-            reportsSubmenu.classList.remove('active');
-            reportsDropdown.innerHTML = 'Reports ▼';
+
+        document.addEventListener("click", function (e) {
+          if (
+            !e.target.closest("#reportsDropdown") &&
+            !e.target.closest("#reportsSubmenu")
+          ) {
+            reportsSubmenu.classList.remove("active");
+            reportsDropdown.innerHTML = "Reports ▼";
           }
         });
       });
     </script>
   </body>
 </html>
-

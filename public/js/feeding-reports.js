@@ -179,9 +179,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const renderFeedingReportsTable = async () => {
     const feedingTableBody = document.getElementById("feedingTableBody");
-    // Colspan set to 6
+    // Colspan set to 5
     feedingTableBody.innerHTML =
-      '<tr><td colspan="6" style="text-align: center; padding: 20px;">Loading feeding reports...</td></tr>';
+      '<tr><td colspan="5" style="text-align: center; padding: 20px;">Loading feeding reports...</td></tr>';
 
     let lastDoc = null;
     if (currentPage > 1) {
@@ -219,9 +219,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     feedingTableBody.innerHTML = "";
 
     if (feedingReports.length === 0) {
-      // Colspan set to 6
+      // Colspan set to 5
       feedingTableBody.innerHTML =
-        "<tr><td colspan='6' style='text-align: center; padding: 20px;'>No feeding reports found.</td></tr>";
+        "<tr><td colspan='5' style='text-align: center; padding: 20px;'>No feeding reports found.</td></tr>";
       return;
     }
 
@@ -316,7 +316,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       const displayStatus = report.displayStatus;
 
       row.innerHTML = `
-        <td>${report.id}</td>
         <td>${report.displayPetName}</td>
         <td>${report.displayRoomType}</td>
         <td>${displayFeedingTime}</td>
@@ -506,24 +505,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     modalBody.innerHTML = `
         <div class="info-section">
           <div class="info-group">
-            <label>Customer</label>
-            <span>${reportData.customerName || "N/A"}</span>
-          </div>
-          <div class="info-group">
             <label>Pet Name</label>
             <span>${displayPetNameForModal}</span>
-          </div>
-          <div class="info-group">
-            <label>Owner Name</label>
-            <span>${displayOwnerNameForModal}</span>
-          </div>
-          <div class="info-group">
-            <label>Pet ID</label>
-            <span>${reportData.petId || "N/A"}</span>
-          </div>
-          <div class="info-group">
-            <label>User ID</label>
-            <span>${reportData.userId || "N/A"}</span>
           </div>
           <div class="info-group">
             <label>Room Type</label>
@@ -532,10 +515,6 @@ document.addEventListener("DOMContentLoaded", async () => {
           <div class="info-group">
             <label>Feeding Schedule Time</label>
             <span>${displayFeedingScheduleTimeForModal}</span>
-          </div>
-          <div class="info-group">
-            <label>Actual Feeding Time</label>
-            <span>${displayActualFeedingTimeForModal}</span>
           </div>
           <div class="info-group">
             <label>Notes</label>

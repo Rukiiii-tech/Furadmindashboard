@@ -1,3 +1,8 @@
+/*
+ * print.css
+ * Styles specifically for print media to ensure a clean receipt/report output.
+ */
+
 @media screen {
   .print-only,
   .print-table-container {
@@ -6,6 +11,9 @@
 }
 
 @media print {
+  /* ==========================================================
+     1. GLOBAL PRINT OVERRIDES (Hiding the entire application)
+     ========================================================== */
   html,
   body {
     background: #ffffff !important;
@@ -13,21 +21,122 @@
     print-color-adjust: exact;
     padding: 0;
     margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
   }
 
-  /* Hide all dashboard UI elements */
+  /* Hide everything on the page's structure that isn't the modal */
   .sidebar,
   .logout,
-  .controls-section,
-  .table-container,
-  .modal,
+  .dashboard-container,
+  .main-content,
   .overlay,
-  .no-print,
-  .page-header {
+  .no-print {
     display: none !important;
   }
 
-  /* Show the specific content for printing */
+  /* ==========================================================
+     2. RECEIPT MODAL ISOLATION & FORMATTING
+     (We must force the modal visible and reset its dimensions)
+     ========================================================== */
+
+  /* Force the modal container (#detailsModal) to be visible */
+  .modal {
+    /* Targets #detailsModal which has the .modal class */
+    display: block !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    background: none !important; /* Remove the dark backdrop */
+    z-index: 9999 !important;
+  }
+
+  /* Format the modal content wrapper */
+  .modal-content {
+    /* Reset layout properties for printing */
+    width: 100% !important;
+    max-width: none !important;
+    min-width: auto !important;
+    border: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    background: none !important;
+  }
+
+  /* Hide modal header/footer buttons */
+  .modal-header,
+  .modal-footer {
+    display: none !important;
+  }
+
+  /* Format the modal body which holds the receipt content */
+  .modal-body {
+    /* Center the receipt on the paper by restricting max-width and using auto margins */
+    max-width: 400px !important; /* Standard receipt width */
+    width: 90% !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: white !important;
+    font-size: 11pt !important;
+  }
+
+  /* Target the innermost receipt content wrapper (ID'd in JS) */
+  .receipt-content-wrapper {
+    display: block !important;
+    width: 100%;
+    padding: 0 !important;
+  }
+
+  /* Ensure the print area itself is styled */
+  .receipt-print-area {
+    width: 100% !important;
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 20px !important;
+    color: #000 !important; /* Force black text */
+    font-size: 11pt !important;
+  }
+
+  /* ==========================================================
+     3. FORCE COLOR/BORDER PRINTING
+     ========================================================== */
+
+  /* Force exact colors for status backgrounds and headers */
+  .receipt-header h2,
+  .receipt-header p,
+  .receipt-header,
+  .total-line.final-status {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Ensure all separator lines are visible */
+  .receipt-header {
+    border-bottom-color: #000 !important;
+  }
+  .receipt-section.customer-info {
+    border-bottom: 1px dashed #000 !important;
+  }
+  .receipt-charges {
+    border-bottom: 1px dashed #000 !important;
+  }
+  .receipt-totals .total-line.balance-due {
+    border-top: 2px solid #000 !important;
+  }
+  .receipt-footer {
+    border-top: 1px solid #000 !important;
+  }
+
+  /* General print styles (for printed report table if user prints outside the modal) */
   .print-only,
   .print-table-container {
     display: block !important;
@@ -36,115 +145,9 @@
     overflow: visible !important;
   }
 
-  /* --- Receipt-Specific Print Styles --- */
-  .receipt-print-wrapper {
-    width: 300px; /* Standard receipt paper width, adjust as needed */
-    margin: 0 auto;
-    padding: 10px;
-    color: #000;
-    font-family: monospace, sans-serif;
-    font-size: 11px;
-  }
-
-  .receipt-print-area {
-    page-break-after: always; /* Each receipt starts on a new page */
-    padding: 10px 0;
-  }
-
-  .receipt-header,
-  .receipt-section,
-  .receipt-totals {
-    font-size: 1em;
-  }
-
-  .receipt-header h2 {
-    font-size: 1.5em !important;
-    font-weight: bold !important;
-    margin-bottom: 5px !important;
-  }
-
-  .info-line {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 3px;
-  }
-
-  .info-line .info-label {
-    font-weight: bold;
-  }
-
-  .receipt-charges {
-    border-bottom: 1px dashed #000 !important;
-    padding-bottom: 5px !important;
-    margin-bottom: 5px !important;
-  }
-
-  .receipt-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 3px 0;
-  }
-
-  .receipt-item .item-name {
-    text-align: left;
-  }
-
-  .receipt-item .item-price {
-    text-align: right;
-  }
-
-  .receipt-totals .total-line {
-    display: flex;
-    justify-content: space-between;
-    padding: 3px 0;
-  }
-
-  .receipt-totals .balance-due {
-    border-top: 1px solid #000 !important;
-    padding-top: 5px !important;
-    font-size: 1.1em;
-    font-weight: bold;
-  }
-
-  /* Existing table print styles */
   .print-header {
     margin-bottom: 10px;
     padding-bottom: 10px;
     border-bottom: 2px solid #000;
-  }
-
-  .print-header h1 {
-    font-size: 20px;
-    margin: 0 0 4px 0;
-  }
-
-  .print-header .meta {
-    font-size: 12px;
-  }
-
-  /* Style the printed table */
-  .print-table-container .data-table {
-    min-width: 0 !important;
-    width: 100% !important;
-    border: 1px solid #000 !important;
-    font-size: 12px !important;
-    page-break-inside: auto !important;
-  }
-
-  .print-table-container .data-table th,
-  .print-table-container .data-table td {
-    border: 1px solid #000 !important;
-    padding: 8px !important;
-    page-break-inside: avoid !important;
-  }
-
-  .print-table-container .data-table tbody tr:nth-child(even),
-  .print-table-container .data-table tbody tr:hover {
-    background: none !important;
-  }
-
-  a {
-    text-decoration: none !important;
-    color: #000 !important;
   }
 }

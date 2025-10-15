@@ -33,18 +33,65 @@ function convertKgToGrams(weightKg) {
   return "N/A";
 }
 
-async function loadPetsData() {
+/**
+ * Calculates the age in years and total months based on the birthdate string (YYYY-MM-DD).
+ * @param {string} birthdateString - The pet's birthdate in 'YYYY-MM-DD' format.
+ * @returns {{years: number, months: number, totalMonths: number} | string} The age details, or 'N/A'.
+ */
+function calculateAge(birthdateString) {
+  if (!birthdateString || birthdateString === "N/A") {
+    return "N/A";
+  }
+  const parts = birthdateString.split("-");
+  if (parts.length !== 3) return "N/A";
+  const birthDate = new Date(parts[0], parts[1] - 1, parts[2]);
+  if (isNaN(birthDate)) return "N/A";
+
+  const today = new Date();
+  let years = today.getFullYear() - birthDate.getFullYear();
+  let months = today.getMonth() - birthDate.getMonth();
+
+  if (today.getDate() < birthDate.getDate()) {
+    months--;
+  }
+
+  if (months < 0) {
+    years--;
+    months += 12;
+  }
+
+  const totalMonths = years * 12 + months;
+
+  return { years: years, months: months, totalMonths: totalMonths };
+}
+
+/**
+ * Loads and displays pet data, optionally filtering by age stage.
+ * @param {string|null} [ageStageFilter=null] - The age stage string (e.g., "0-6M", "1-2Y").
+ */
+export async function loadPetsData(ageStageFilter = null) {
   const petsTableBody = document.getElementById("petsTableBody");
   if (!petsTableBody) {
     console.error("Error: Pets table body element not found.");
     return;
   }
 
-  // Set initial loading message, adjusting colspan for the total number of columns
-  // COLSPAN ADJUSTED to 12 (original 9 + 3 new columns)
+  // Define age boundaries in total months for filtering
+  const ageBoundaries = {
+    "0-6M": { minMonths: 0, maxMonths: 6 },
+    "6-12M": { minMonths: 6, maxMonths: 12 },
+    "1-2Y": { minMonths: 12, maxMonths: 24 },
+    "2-3Y": { minMonths: 24, maxMonths: 36 },
+    "3+Y": { minMonths: 36, maxMonths: Infinity },
+  };
+
+  const selectedRange = ageBoundaries[ageStageFilter];
+  const isFiltering = !!selectedRange;
+
+  // Set initial loading message, adjusting colspan for the total number of columns (now 9)
   petsTableBody.innerHTML = `
     <tr>
-      <td colspan="12" style="text-align: center; padding: 20px;">
+      <td colspan="9" style="text-align: center; padding: 20px;">
         Loading pet details...
       </td>
     </tr>
@@ -57,13 +104,13 @@ async function loadPetsData() {
     if (petsSnapshot.empty) {
       petsTableBody.innerHTML = `
         <tr>
-          <td colspan="12" style="text-align: center; padding: 20px">No pet details found.</td>
+          <td colspan="9" style="text-align: center; padding: 20px">No pet details found.</td>
         </tr>
       `;
       return;
     }
 
-    const petsData = [];
+    let petsData = [];
     for (const petDoc of petsSnapshot.docs) {
       const pet = petDoc.data();
 
@@ -77,6 +124,26 @@ async function loadPetsData() {
         }
       }
 
+      const ageResult = calculateAge(pet.dateOfBirth);
+      const ageInYears =
+        typeof ageResult === "object" ? ageResult.years : "N/A";
+      // Use age in total months for filtering accuracy
+      const ageTotalMonths =
+        typeof ageResult === "object" ? ageResult.totalMonths : -1;
+
+      // Apply filtering based on selected age range
+      if (isFiltering) {
+        // Filter is applied if the pet's age is within the selected minimum (inclusive)
+        // and below the maximum (exclusive).
+        if (
+          ageTotalMonths === -1 ||
+          ageTotalMonths < selectedRange.minMonths ||
+          ageTotalMonths >= selectedRange.maxMonths
+        ) {
+          continue; // Skip this pet if it's outside the selected age range
+        }
+      }
+
       petsData.push({
         id: petDoc.id, // The document ID of the pet itself
         ownerFullName: ownerFullName, //
@@ -86,15 +153,19 @@ async function loadPetsData() {
         petGender: pet.petGender || "N/A",
         petWeight: pet.petWeight || "N/A",
         birthdate: pet.dateOfBirth || "N/A",
+        age: ageInYears, // Display age in years
         cageType: pet.cageType || "N/A", // 'cageType' from petsp
         petColorsMarkings: pet.petColorsMarkings || "N/A", // From petsp
         // Feeding schedule details from petsp (for modal)
         morningFeeding: pet.morningFeeding || false,
         morningTime: pet.morningTime || "N/A",
+        morningFoodGrams: pet.morningFoodGrams || "N/A",
         afternoonFeeding: pet.afternoonFeeding || false,
         afternoonTime: pet.afternoonTime || "N/A",
+        afternoonFoodGrams: pet.afternoonFoodGrams || "N/A",
         eveningFeeding: pet.eveningFeeding || false,
         eveningTime: pet.eveningTime || "N/A",
+        eveningFoodGrams: pet.eveningFoodGrams || "N/A",
         // Image URLs from petsp
         vaccinationImage: pet.vaccinationRecordImageUrl || null,
         petProfileImage: pet.petProfileImageUrl || null,
@@ -102,9 +173,12 @@ async function loadPetsData() {
     }
 
     if (petsData.length === 0) {
+      const message = isFiltering
+        ? `No pets found matching the selected age stage.`
+        : `No pet details found.`;
       petsTableBody.innerHTML = `
         <tr>
-          <td colspan="12" style="text-align: center; padding: 20px">No pet details found.</td> </tr>
+          <td colspan="9" style="text-align: center; padding: 20px">${message}</td> </tr>
       `;
       return;
     }
@@ -121,6 +195,7 @@ async function loadPetsData() {
       row.insertCell().textContent = petDetails.petGender;
       row.insertCell().textContent = formatWeight(petDetails.petWeight);
       row.insertCell().textContent = petDetails.birthdate;
+      row.insertCell().textContent = petDetails.age; // Display Age
       row.insertCell().textContent = petDetails.cageType;
 
       // Add Actions column with View Details button
@@ -141,7 +216,7 @@ async function loadPetsData() {
     if (petsTableBody) {
       petsTableBody.innerHTML = `
         <tr>
-          <td colspan="12" style="text-align: center; padding: 20px; color: red"> Failed to load pet data. Error: ${initialError.message || initialError}.
+          <td colspan="9" style="text-align: center; padding: 20px; color: red"> Failed to load pet data. Error: ${initialError.message || initialError}.
           </td>
         </tr>
       `;
@@ -149,7 +224,7 @@ async function loadPetsData() {
   }
 }
 
-// Function to show pet details in the modal (UPDATED to use showGenericModal and full details)
+// Function to show pet details in the modal
 function showPetDetailsModal(details) {
   const modalElement = document.getElementById("petDetailsModal");
   const modalBodyContentElement = document.getElementById("petDetailsBody");
@@ -184,6 +259,9 @@ function showPetDetailsModal(details) {
       </div>
       <div class="info-item">
         <strong>Pet Weight:</strong> <p>${formatWeight(details.petWeight)}</p>
+      </div>
+      <div class="info-item">
+        <strong>Pet Age (Years):</strong> <p>${details.age}</p>
       </div>
       <div class="info-item">
         <strong>Total Pet Food Grams (from weight):</strong> <p>${totalPetGramsFromWeight}</p>

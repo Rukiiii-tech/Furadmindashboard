@@ -81,7 +81,6 @@ if (statusFilter) {
 
 /**
  * Fetches all approved booking documents from the "bookings" collection in Firestore.
- * This function retrieves bookings with status "Approved", "Completed", or "Checked-Out".
  *
  * @returns {Promise<Array>} Array of approved booking objects
  */
@@ -89,10 +88,16 @@ const fetchApprovedBookingsFromFirestore = async () => {
   try {
     console.log("Fetching approved bookings from Firestore...");
 
-    // Query for approved, checked-out, check-in, and extended bookings
+    // FIX: Ensure all in-progress statuses, including "Feeding Scheduled", are fetched.
     const approvedBookingsQuery = query(
       collection(db, "bookings"),
-      where("status", "in", ["Approved", "Checked-Out", "Check In", "Extended"])
+      where("status", "in", [
+        "Approved",
+        "Checked-Out",
+        "Check In",
+        "Extended",
+        "Feeding Scheduled",
+      ])
     );
 
     const querySnapshot = await getDocs(approvedBookingsQuery);
@@ -104,16 +109,11 @@ const fetchApprovedBookingsFromFirestore = async () => {
       console.log("=== RAW BOOKING DATA ===");
       console.log("Document ID:", doc.id);
       console.log("Status:", data.status);
-      console.log("Pet Information:", data.petInformation);
-      console.log("Owner Information:", data.ownerInformation);
-      console.log("Service Type:", data.serviceType);
-      console.log("Date:", data.date);
-      console.log("All data fields:", Object.keys(data));
       console.log("========================");
       bookings.push({ id: doc.id, ...data });
     });
 
-    console.log("Approved bookings fetched:", bookings);
+    console.log("Approved bookings fetched:", bookings.length);
     return bookings;
   } catch (error) {
     console.error("Error fetching approved bookings:", error);
@@ -141,7 +141,6 @@ const applyFilters = (bookings) => {
 
 /**
  * Renders the approved bookings table based on the current filter and fetched data.
- * Fetches all approved bookings, then filters them locally before rendering.
  */
 const renderApprovedBookingsTable = async () => {
   try {
@@ -150,12 +149,6 @@ const renderApprovedBookingsTable = async () => {
 
     // Apply filters
     filteredBookings = applyFilters(allFetchedBookings);
-    console.log("=== FILTERING DEBUG ===");
-    console.log("All fetched bookings:", allFetchedBookings.length);
-    console.log("After filtering:", filteredBookings.length);
-    console.log("Current status filter:", currentStatusFilter);
-    console.log("Filtered bookings:", filteredBookings);
-    console.log("======================");
 
     // Clear and populate table
     const approvedBookingsTableBody = document.getElementById(
@@ -164,7 +157,7 @@ const renderApprovedBookingsTable = async () => {
     approvedBookingsTableBody.innerHTML = ""; // Clear existing rows
 
     if (filteredBookings.length === 0) {
-      // If no approved bookings found, show a helpful message and suggest checking the database
+      // If no approved bookings found, show a helpful message
       approvedBookingsTableBody.innerHTML = `
         <tr>
           <td colspan='9' style='text-align: center; padding: 20px;'>
@@ -172,8 +165,7 @@ const renderApprovedBookingsTable = async () => {
             <div style='font-size: 12px; color: #666;'>
               This could mean:<br>
               • No bookings have been approved yet<br>
-              • All bookings are still pending<br>
-              • Check the "Pending Bookings" page to approve some bookings
+              • All bookings are still pending
             </div>
           </td>
         </tr>
@@ -181,7 +173,7 @@ const renderApprovedBookingsTable = async () => {
       return;
     }
 
-    // Sort bookings: today's bookings first, then by date
+    // Sort bookings: today's bookings first, then by date (most recent first)
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -207,14 +199,11 @@ const renderApprovedBookingsTable = async () => {
       }
 
       // Check if either is today
+      const oneDay = 24 * 60 * 60 * 1000;
       const aIsToday =
-        dateA &&
-        dateA >= today &&
-        dateA < new Date(today.getTime() + 24 * 60 * 60 * 1000);
+        dateA && dateA >= today && dateA < new Date(today.getTime() + oneDay);
       const bIsToday =
-        dateB &&
-        dateB >= today &&
-        dateB < new Date(today.getTime() + 24 * 60 * 60 * 1000);
+        dateB && dateB >= today && dateB < new Date(today.getTime() + oneDay);
 
       // Today's bookings first
       if (aIsToday && !bIsToday) return -1;
@@ -222,7 +211,7 @@ const renderApprovedBookingsTable = async () => {
 
       // Then sort by date (most recent first)
       if (dateA && dateB) {
-        return dateB - dateA;
+        return dateB.getTime() - dateA.getTime();
       }
 
       return 0;
@@ -234,22 +223,7 @@ const renderApprovedBookingsTable = async () => {
     filteredBookings.forEach((booking) => {
       const row = document.createElement("tr");
 
-      // Debug: Log all available fields for this booking
-      console.log("=== BOOKING DEBUG ===");
-      console.log("Booking ID:", booking.id);
-      console.log("Available fields:", Object.keys(booking));
-      console.log("Status:", booking.status);
-      console.log("Pet Information:", booking.petInformation);
-      console.log("Pet Name:", booking.petInformation?.petName);
-      console.log("Owner Information:", booking.ownerInformation);
-      console.log("Owner First Name:", booking.ownerInformation?.firstName);
-      console.log("Owner Last Name:", booking.ownerInformation?.lastName);
-      console.log("Service Type:", booking.serviceType);
-      console.log("Date:", booking.date);
-      console.log("Full booking data:", booking);
-      console.log("===================");
-
-      // Format check-in date using the actual 'date' field from the database
+      // Format check-in date
       let checkInDateStr = "N/A";
       let checkInDateObj = null;
       let isToday = false;
@@ -310,7 +284,7 @@ const renderApprovedBookingsTable = async () => {
       // Create status badge
       const statusBadge = `<span class="status-badge status-${booking.status ? booking.status.toLowerCase().replace(/[ -]/g, "-") : "unknown"}">${booking.status}</span>`;
 
-      // Get customer information using the actual field names from the database
+      // Get customer information
       const petName = booking.petInformation?.petName || "N/A";
       const ownerName = booking.ownerInformation
         ? `${booking.ownerInformation.firstName || ""} ${booking.ownerInformation.lastName || ""}`.trim()
@@ -338,17 +312,16 @@ const renderApprovedBookingsTable = async () => {
         <td style="${rowStyle}">
           <button class="action-btn btn-view" data-id="${booking.id}">View</button>
           ${
+            // 1. CHECK IN BUTTON FIX: ONLY appears if the status is the initial 'Approved'.
             booking.status === "Approved"
               ? `<button class="action-btn btn-checkin" data-id="${booking.id}">Check In</button>`
               : ""
           }
           ${
-            booking.status === "Check In"
-              ? `<button class="action-btn btn-checkout" data-id="${booking.id}">Checkout</button>`
-              : ""
-          }
-          ${
-            booking.status === "Extended"
+            // 2. CHECK OUT BUTTON FIX: Appears for all in-progress statuses.
+            booking.status === "Check In" ||
+            booking.status === "Extended" ||
+            booking.status === "Feeding Scheduled"
               ? `<button class="action-btn btn-checkout" data-id="${booking.id}">Checkout</button>`
               : ""
           }
@@ -523,7 +496,6 @@ window.viewApprovedBookingDetails = async function (bookingId) {
     const serviceType = booking.serviceType || "N/A";
     const roomType = booking.boardingDetails?.selectedRoomType || "N/A";
 
-    // FIX: Define customerName using ownerName to resolve the ReferenceError
     const customerName = ownerName;
 
     // Create modal content with standardized design matching pending bookings
@@ -646,7 +618,7 @@ window.handleCheckinClick = async function (bookingId) {
       // Refresh the table to show the updated status
       renderApprovedBookingsTable();
     } catch (error) {
-      console.error("Error updating booking status:", error);
+      console.error("Error updating document: ", error);
       showErrorNotification(
         "Check-in Failed",
         "Failed to update booking status: " + error.message,
@@ -673,7 +645,6 @@ window.handleCheckoutClick = async function (bookingId) {
     }
 
     // Calculate balance using the same logic as the main bookings page
-    // NOTE: This call now uses the fixed logic to calculate amounts based on actual stay duration.
     const { totalAmount, downPayment, balance } =
       calculateBookingAmounts(booking);
 
