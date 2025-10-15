@@ -41,6 +41,16 @@ let currentStatusFilter = "Pending"; // Default filter to show only pending book
 let currentDateFilter = "all"; // Default date filter
 let refreshInterval; // Variable to store the refresh interval
 
+// Global function definition for applyFilters to resolve ReferenceError in startRealTimeRefresh
+/**
+ * Global placeholder for applyFilters function.
+ * This will be properly defined inside DOMContentLoaded but needs a global declaration
+ * to allow startRealTimeRefresh (which is outside the listener) to access it.
+ */
+let applyFilters = () => {
+  console.warn("applyFilters not yet initialized.");
+};
+
 document.addEventListener("DOMContentLoaded", async () => {
   const bookingsTableBody = document.getElementById("bookingsTableBody");
   const statusFilterSelect = document.getElementById("statusFilter");
@@ -161,9 +171,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   /**
-   * Apply filters to bookings data
+   * Apply filters to bookings data (Overwriting the global placeholder)
    */
-  const applyFilters = () => {
+  applyFilters = () => {
     renderBookingsTable();
   };
 
@@ -687,7 +697,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       try {
         const bookingSnap = await getDoc(bookingRef);
         if (!bookingSnap.exists()) {
-          alert("Booking data not found in Firestore for ID: " + bookingId);
+          // Changed alert to use notification modal if available
+          showErrorNotification(
+            "Booking Error",
+            "Booking Data Not Found",
+            "The booking data for this ID could not be found in Firestore. Please refresh.",
+            "❌"
+          );
           console.error(
             "Booking data not found in Firestore for ID: " + bookingId
           );
@@ -704,6 +720,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     } else {
       console.log("Booking data found in cache:", bookingData);
     }
+
+    // --- FIX: Define customerName here using bookingData ---
+    const customerName = bookingData.ownerInformation
+      ? `${bookingData.ownerInformation.firstName || ""} ${bookingData.ownerInformation.lastName || ""}`.trim()
+      : "N/A";
+    // --- END FIX ---
 
     // --- Construct the HTML for the modal content ---
     let detailsHtml = `
@@ -829,7 +851,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Use showGenericModal from modal_handler.js
     showGenericModal(
       viewDetailsModal,
-      `Booking Details: ${bookingId}`,
+      `Booking Details: ${customerName}`, // Changed title to use customerName for better context
       detailsHtml,
       bookingDetailsContent
     );
@@ -1070,11 +1092,20 @@ document.addEventListener("DOMContentLoaded", async () => {
         // Rejection success notification is handled by the new rejection flow
         // No need to show additional notification here
       } else {
-        alert(`Booking ${statusToUpdate.toLowerCase()} successfully!`);
+        // Changed alert to use showToastSuccess
+        showToastSuccess(
+          `Booking ${statusToUpdate.toLowerCase()} successfully!`
+        );
       }
     } catch (error) {
       console.error("Error updating booking status:", error);
-      alert("Failed to update booking status: " + error.message);
+      // Changed alert to use showErrorNotification
+      showErrorNotification(
+        "Update Error",
+        "Failed to Update Booking Status",
+        "An error occurred: " + error.message,
+        "❌"
+      );
     }
   }
 
@@ -1085,6 +1116,9 @@ document.addEventListener("DOMContentLoaded", async () => {
    * @returns {Promise<boolean>} Resolves with true if confirmed, false otherwise.
    */
   function showConfirmation(title, message) {
+    // Note: The original code used a native alert/confirm.
+    // For a robust system, you should replace this with a custom modal.
+    // Assuming this function is not actively used due to usage of showConfirmationModal elsewhere.
     return new Promise((resolve) => {
       resolve(confirm(`${title}\n\n${message}`));
     });
@@ -1109,7 +1143,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       try {
         const bookingSnap = await getDoc(bookingRef);
         if (!bookingSnap.exists()) {
-          alert("Booking data not found in Firestore for ID: " + bookingId);
+          showErrorNotification(
+            "Booking Error",
+            "Booking Data Not Found",
+            "The booking data for this ID could not be found in Firestore. Please refresh.",
+            "❌"
+          );
           console.error(
             "Booking data not found in Firestore for ID: " + bookingId
           );
@@ -1120,7 +1159,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.log("Booking data fetched from Firestore:", bookingData);
       } catch (err) {
         console.error("Error fetching booking from Firestore:", err);
-        alert("Error fetching booking details: " + err.message);
+        showErrorNotification(
+          "Database Error",
+          "Error Fetching Booking Details",
+          "An error occurred: " + err.message,
+          "❌"
+        );
         return;
       }
     }
@@ -1191,8 +1235,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (!viewDetailsModal || !bookingDetailsContent) {
       console.error("Modal elements not found!");
-      alert(
-        "Error: Modal elements not found. Please refresh the page and try again."
+      showErrorNotification(
+        "Modal Error",
+        "Modal Elements Not Found",
+        "Please refresh the page and try again.",
+        "❌"
       );
       return;
     }
@@ -1308,6 +1355,7 @@ function startRealTimeRefresh() {
     try {
       console.log("Auto-refreshing bookings data...");
 
+      // FIX: applyFilters is now globally accessible
       await applyFilters();
     } catch (error) {
       console.error("Error during auto-refresh:", error);
