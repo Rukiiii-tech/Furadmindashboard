@@ -714,14 +714,20 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.log("Booking data fetched from Firestore:", bookingData);
       } catch (err) {
         console.error("Error fetching booking from Firestore:", err);
-        alert("Error fetching booking details: " + err.message);
+        // FIX: Replaced alert with showErrorNotification
+        showErrorNotification(
+          "Database Error",
+          "Error Fetching Booking Details",
+          "An error occurred: " + err.message,
+          "❌"
+        );
         return;
       }
     } else {
       console.log("Booking data found in cache:", bookingData);
     }
 
-    // --- FIX: Define customerName here using bookingData ---
+    // --- FIX: Define customerName here using bookingData (Resolved ReferenceError) ---
     const customerName = bookingData.ownerInformation
       ? `${bookingData.ownerInformation.firstName || ""} ${bookingData.ownerInformation.lastName || ""}`.trim()
       : "N/A";
