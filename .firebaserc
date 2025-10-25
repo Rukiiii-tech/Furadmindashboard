@@ -1,22 +1,15 @@
 {
   "projects": {
-    "default": "furrytalls-bb67e"
+    "default": "furrytails-bb67e"
   },
   "targets": {
-    "furrytalls-bb67e": {
-      "hosting": {
-        "admin-app": [
-          "furrytalls-bb67e"
-        ],
-        "customer-app": [
-          "furrytalls-customerpwa"
-        ]
-      }
-    },
     "furrytails-bb67e": {
       "hosting": {
-        "customer-app": [
-          "furrytalls-customerpwa"
+        "furadmindashboard": [
+          "furrytails-bb67e"
+        ],
+        "customerpwa": [
+          "furrytails-customerpwa"
         ]
       }
     }
