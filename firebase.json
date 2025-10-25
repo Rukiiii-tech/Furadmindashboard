@@ -2,7 +2,7 @@
   "hosting": [
     {
       "target": "furadmindashboard",
-      "public": "public",
+      "public": "furadmindashboard",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
     },
 
