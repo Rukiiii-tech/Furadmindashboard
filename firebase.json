@@ -2,21 +2,18 @@
   "hosting": [
     {
       "target": "furadmindashboard",
-      "public": "public",
+      "public": "furadmindashboard/public",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
     },
-    {
-      "source": "**",
-      "destination": "/index.html"
-    },
+
     {
       "target": "customerpwa",
-      "public": "public",
+      "public": "customerpwa/build/web",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
       "rewrites": [
         {
           "source": "**",
-          "destination": "build/web/index.html"
+          "destination": "/index.html"
         }
       ]
     }
