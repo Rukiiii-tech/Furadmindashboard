@@ -1,10 +1,21 @@
 {
-  "hosting": {
-    "public": "public",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ]
-  }
+  "hosting": [
+    {
+      "target": "admin-app",
+      "public": "furadmindashboard/public",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
+    },
+
+    {
+      "target": "customer-app",
+      "public": "customerpwa/build/web",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
+    }
+  ]
 }
