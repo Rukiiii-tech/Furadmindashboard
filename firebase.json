@@ -1,7 +1,7 @@
 {
   "hosting": [
     {
-      "target": "admin-app",
+      "target": "furadmindasboard",
       "public": "furadmindashboard/public",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
     },
