@@ -8,7 +8,7 @@
 
     {
       "target": "customerpwa",
-      "public": "/build/web",
+      "public": "customerpwa/build/web",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
       "rewrites": [
         {
