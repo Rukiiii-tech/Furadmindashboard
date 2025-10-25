@@ -1,13 +1,13 @@
 {
   "hosting": [
     {
-      "target": "furadmindasboard",
+      "target": "furadmindashboard",
       "public": "furadmindashboard/public",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
     },
 
     {
-      "target": "customer-app",
+      "target": "customerpwa",
       "public": "customerpwa/build/web",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
       "rewrites": [
