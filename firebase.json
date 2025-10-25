@@ -5,16 +5,15 @@
       "public": "public",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
     },
-
+    {
+      "source": "**",
+      "destination": "/index.html"
+    },
     {
       "target": "customerpwa",
-      "public": "customerpwa/build/web",
+      "public": "public",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
       "rewrites": [
-        {
-          "source": "**",
-          "destination": "/index.html"
-        },
         {
           "source": "**",
           "destination": "build/web/index.html"
