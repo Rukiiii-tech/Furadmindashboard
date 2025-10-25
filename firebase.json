@@ -5,10 +5,9 @@
       "public": "public",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
     },
-
     {
       "target": "customerpwa",
-      "public": "build",
+      "public": "customerpwa/build/web",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
       "rewrites": [
         {
